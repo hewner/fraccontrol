@@ -51,6 +51,15 @@ public class RuleMenu extends JComponent implements KeyListener {
 		if(e.getKeyChar() == 'z' && selection < maxSelection()) {
 			selection++;
 			repaint();
+		}
+		if(e.getKeyChar() == 'q') {
+			Animation animation = new Animation(1000, new Point(0,600),this);
+			animation.startAnimation();
+		}
+		if(e.getKeyChar() == 'w') {
+			Animation animation = new Animation(1000, new Point(0,0),this);
+			animation.startAnimation();
 		}		
+
 	}
 }
