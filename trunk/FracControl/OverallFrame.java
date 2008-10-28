@@ -1,7 +1,9 @@
+import java.awt.Point;
 import java.awt.event.*;
 
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
+import javax.swing.Timer;
 
 
 public class OverallFrame extends JFrame {
@@ -56,9 +58,9 @@ public class OverallFrame extends JFrame {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		RuleMenu ruleMenu = new RuleMenu();
+		final RuleMenu ruleMenu = new RuleMenu();
 		getLayeredPane().setLayer(ruleMenu, JLayeredPane.PALETTE_LAYER);
-		//getLayeredPane().add(ruleMenu);
+		getLayeredPane().add(ruleMenu);
 		addKeyListener(ruleMenu);
 		ruleMenu.setSize(200,getHeight());
 		
@@ -68,7 +70,6 @@ public class OverallFrame extends JFrame {
 				System.exit(0);
 			}
 		});
-	
 	}
 
 	private static void createAndShowGUI() {

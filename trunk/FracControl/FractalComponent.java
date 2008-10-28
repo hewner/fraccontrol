@@ -17,7 +17,7 @@ public class FractalComponent extends JComponent {
 				repaint();
 			}			
 		};
-		Timer timer = new Timer(1000,repaintListener);
+		Timer timer = new Timer(100,repaintListener);
 		timer.start();
 	}
 	public void setBounds(int x, int y, int width, int height) {
