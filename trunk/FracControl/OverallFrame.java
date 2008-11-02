@@ -1,5 +1,7 @@
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
@@ -14,44 +16,30 @@ public class OverallFrame extends JFrame {
 		try {
 			FractalPainter painter = new FractalPainter();
 			getContentPane().add(new FractalComponent(painter));
+			Design design = new Design(Color.BLUE);
+			AffineTransform upLeft = new AffineTransform();
+			upLeft.scale(0.5,0.5);
+			AffineTransform upRight = new AffineTransform();
+			upRight.translate(0,0.5);
+			upRight.scale(0.5,0.5);
+			AffineTransform lowLeft = new AffineTransform();
+			lowLeft.translate(0.5,0);
+			lowLeft.scale(0.5,0.5);
+			AffineTransform lowRight = new AffineTransform();
+			lowRight.translate(0.5,0.5);
+			lowRight.scale(0.5,0.5);
+			painter.addDesign("foo", design);
+			design.addSubdesign("bar", new AffineTransform(lowLeft));
+			design.addSubdesign("bar", new AffineTransform(upRight));
+			design = new Design(Color.GREEN);
+			painter.addDesign("bar", design);
+			design.addSubdesign("foo", new AffineTransform(upLeft));
+			design.addSubdesign("foo", new AffineTransform(lowRight));
 			
-			painter.addRule("double", new Rule() {
-				public void draw() {
-					rule("square");
-					rule("gasket");
-					
-				}
-			});
+			painter.setStartRule("foo");
 			
-			painter.addRule("gasket", new Rule() {
-				public void draw() {
-					rule("little square");
-					translate(-25, 50);
-					rule("gasket");
-					translate(50,0);
-					rule("gasket");
-				}
-			});
-			painter.addRule("little square", new Rule() {
-				public void draw() {
-					scale(.1);
-					square();
-				}
-			});
-			painter.addRule("square", new Rule() {
-				public void draw() {
-                    push();
-					scale(.05,.1);
-					square();
-					pop();
-					translate(20,0);
-					rotate(.05);
-					scale(.995);
-					rule("square");
-				}				
-			});
-			painter.setStartRule("double");
-			if(false) painter.startDrawingWithSize(600, 500);
+			
+			painter.startDrawingWithSize(600, 500);
 		} catch (FractalPainter.RenderingException e) {
 			System.err.println("Initial setup caused a rendering exception");
 			System.err.println(e.toString());
