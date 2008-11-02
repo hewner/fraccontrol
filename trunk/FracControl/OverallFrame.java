@@ -40,6 +40,9 @@ public class OverallFrame extends JFrame {
 			
 			
 			painter.startDrawingWithSize(600, 500);
+			AffineTransform zoom = new AffineTransform();
+			zoom.scale(2, 2);
+			painter.transformView(zoom);
 		} catch (FractalPainter.RenderingException e) {
 			System.err.println("Initial setup caused a rendering exception");
 			System.err.println(e.toString());
