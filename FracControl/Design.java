@@ -29,6 +29,10 @@ public class Design {
 	public void draw(Graphics2D g, FractalPainter painter) {
 		g.setColor(background);
 		Shape rect = new Rectangle2D.Double(0,0,1.0,1.0);
+		if(!rect.intersects(g.getClipBounds())) {
+			//this shape is not on screen
+			return;
+		}
 		g.fill(rect);
 		Graphics2D newG;
 		for(Subdesign sub : subDesigns) {

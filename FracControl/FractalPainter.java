@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -12,6 +13,7 @@ public class FractalPainter {
 	protected BufferedImage image;
 	protected Map<String, Design> designs;
 	protected String startDesign;
+	protected AffineTransform viewTransform;
 	
 	public class RenderingException extends Exception {
 		public RenderingException(String error) {
@@ -31,8 +33,14 @@ public class FractalPainter {
 		if(startDesign == null) throw new RenderingException("No start rule!");
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = image.createGraphics();
+		graphics.setClip(0,0,width,height);
 		startDrawing(graphics);
 	}
+	
+	public void redrawAll() throws RenderingException {
+		startDrawingWithSize(image.getWidth(),image.getHeight());
+	}
+	
 	protected class Pair {
 		public Graphics2D g;
 		public Design design;
@@ -58,29 +66,36 @@ public class FractalPainter {
 			shouldStop = true;
 		}
 		public void run() {
+			int numberDrawn = 0;
 			while(!toDraw.isEmpty() && !shouldStop) {
 				Pair current = toDraw.remove();
 				if(isTooSmall(current.g)) {
 					//System.out.println("Stopping recurse.  Too small.");
 				} else {
 					current.design.draw(current.g,painter);
+					numberDrawn++;
 				}
 			}
 			if(!shouldStop) {
-				System.out.println("Finished drawing.");
+				System.out.println("Finished drawing " + numberDrawn + " shapes.");
 			}
 		}
 		
 	}
 	PaintThread thread;
+	
+	protected void transformView(AffineTransform trans) throws RenderingException {
+		viewTransform().preConcatenate(trans);
+		redrawAll();
+	}
+	
 	protected void startDrawing(Graphics2D g) throws RenderingException {
 		if(thread != null) {			
 			thread.shouldStop();
 			while(thread.isAlive()) {} //ensure we have only 1 thread processing
 		}
 		g.setColor(Color.WHITE);
-		g.scale(unitLength(), unitLength());
-		g.translate(.05, .05);
+		g.transform(viewTransform());
 		
 		RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, 
 				RenderingHints.VALUE_ANTIALIAS_ON);
@@ -128,5 +143,14 @@ public class FractalPainter {
 	
 	public boolean isTooSmall(Graphics2D g) {
 		return(g.getTransform().getScaleX() < .5);
+	}
+	
+	public AffineTransform viewTransform() {
+		if(viewTransform == null) {
+			viewTransform = new AffineTransform();
+			viewTransform.scale(unitLength(), unitLength());
+			viewTransform.translate(0.05, 0.05);
+		}
+		return viewTransform;
 	}
 }
