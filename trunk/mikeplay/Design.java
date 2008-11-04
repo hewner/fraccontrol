@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
@@ -12,6 +13,7 @@ public class Design {
 	
 	Color background;
 	List<Subdesign> subDesigns;
+	Area subDesignArea;
 	
 	protected class Subdesign {
 		public String name;
@@ -30,6 +32,7 @@ public class Design {
 	public Design(Color background) {
 		this.background = background;
 		subDesigns = new LinkedList<Subdesign>();
+		subDesignArea = new Area();
 	}
 	
 	public void draw(Graphics2D g, FractalPainter painter) {
@@ -58,22 +61,44 @@ public class Design {
 		}
 	}
 	
-	public void addSubdesign(String name, AffineTransform trans) {
-		subDesigns.add(new Subdesign(name, trans));
-	}
-
-	public void addSubdesign(String string, Point2D localPoint) {
-		AffineTransform transform = new AffineTransform();
-		transform.translate(localPoint.getX(), localPoint.getY());
-		transform.scale(0.5, 0.5);
-		addSubdesign(string,transform);
-		
+	public void addSubdesign(DesignBounds shape) {
+		setRightScale(shape);
+		Subdesign sub = new Subdesign("sub", shape.transform());
+		subDesignArea.add(shape.computeArea());
+		subDesigns.add(sub);
 	}
 	
-	public void transformSubdesign(Shape shape, AffineTransform trans) {
-		//AffineTransform transform = new AffineTransform();
-		//transform.translate(localPoint.getX(), localPoint.getY());
-		//transform.scale(0.5, 0.5);
-		//return tra;
+	public boolean fits(DesignBounds shape) {
+		Area overall = new Area(new Rectangle2D.Double(0,0,1.0,1.0));
+		Area area = shape.computeArea();
+		area.subtract(overall);
+		if(!area.isEmpty()) return false;
+		area = shape.computeArea();
+		area.intersect(subDesignArea);
+		if(!area.isEmpty()) return false;
+		return true;
+	}
+	
+	public void setRightScale(DesignBounds shape) {
+		
+		if(fits(shape)) {
+			return;
+		}
+		double smallestFailure = shape.getScale();
+		double largestSuccess = 0;
+		for(int i = 0; i < 10; i++) {
+			double newScale = (smallestFailure + largestSuccess)/2;
+			shape.setScale(newScale);
+			if(fits(shape)) {
+				largestSuccess = newScale;
+			} else {
+				smallestFailure = newScale;
+			}
+		}
+		shape.setScale(largestSuccess);
+	}
+	
+	public void transformSubdesign(DesignBounds design) {
+		setRightScale(design);
 	}
 }

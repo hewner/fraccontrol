@@ -79,7 +79,7 @@ public class FractalPainter {
 			while(!toDraw.isEmpty() && !shouldStop) {
 				Pair current = toDraw.remove();
 				if(isTooSmall(current.g)) {
-					//System.out.println("Stopping recurse.  Too small.");
+					System.out.println("Stopping recurse.  Too small.");
 				} else {
 					current.design.draw(current.g,painter);
 					numberDrawn++;
@@ -149,7 +149,7 @@ public class FractalPainter {
 	}
 	
 	public boolean isTooSmall(Graphics2D g) {
-		return(g.getTransform().getScaleX() < .5);
+		return(g.getTransform().getScaleX() < .25);
 	}
 	
 	public AffineTransform viewTransform() {
