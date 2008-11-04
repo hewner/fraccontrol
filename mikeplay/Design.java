@@ -11,9 +11,10 @@ import java.util.List;
 
 public class Design {
 	
-	Color background;
-	List<Subdesign> subDesigns;
-	Area subDesignArea;
+	protected Color background;
+	protected List<Subdesign> subDesigns;
+	protected Area subDesignArea;
+	protected DesignTemplate template;
 	
 	protected class Subdesign {
 		public String name;
@@ -29,10 +30,12 @@ public class Design {
 		return rect;
 	}
 	
-	public Design(Color background) {
+	public Design(Color background, DesignTemplate t) {
 		this.background = background;
 		subDesigns = new LinkedList<Subdesign>();
 		subDesignArea = new Area();
+		template = t;
+		DesignTemplateLibrary.library().addDesign(this);
 	}
 	
 	public void draw(Graphics2D g, FractalPainter painter) {
@@ -100,5 +103,9 @@ public class Design {
 	
 	public void transformSubdesign(DesignBounds design) {
 		setRightScale(design);
+	}
+	
+	public DesignTemplate getTemplate() {
+		return template;
 	}
 }
