@@ -22,6 +22,11 @@ public class Design {
 		}
 	}
 	
+	public static Shape rect = new Rectangle2D.Double(0,0,1.0,1.0);
+	public Shape getShadow() {
+		return rect;
+	}
+	
 	public Design(Color background) {
 		this.background = background;
 		subDesigns = new LinkedList<Subdesign>();
@@ -29,7 +34,7 @@ public class Design {
 	
 	public void draw(Graphics2D g, FractalPainter painter) {
 		g.setColor(background);
-		Shape rect = new Rectangle2D.Double(0,0,1.0,1.0);
+		Shape rect = getShadow(); 
 		if(!rect.intersects(g.getClipBounds())) {
 			//this shape is not on screen
 			return;
@@ -65,10 +70,10 @@ public class Design {
 		
 	}
 	
-	public AffineTransform transformSubdesign(String string, Point2D localPoint) {
-		AffineTransform transform = new AffineTransform();
-		transform.translate(localPoint.getX(), localPoint.getY());
+	public void transformSubdesign(Shape shape, AffineTransform trans) {
+		//AffineTransform transform = new AffineTransform();
+		//transform.translate(localPoint.getX(), localPoint.getY());
 		//transform.scale(0.5, 0.5);
-		return transform;
+		//return tra;
 	}
 }
