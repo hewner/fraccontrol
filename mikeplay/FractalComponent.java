@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
@@ -12,6 +13,7 @@ public class FractalComponent extends JComponent {
 	protected FractalPainter painter;
 	protected Design currentDesign;
 	protected MouseControl mouse;
+	
 	public FractalComponent(FractalPainter p, Design cur) {
 		painter = p;
 		currentDesign = cur;
