@@ -12,10 +12,13 @@ public class OverallFrame extends JFrame {
 	
 	public OverallFrame() {
 		super("FracControl");
+		
 		setSize(600,500);
 		try {
+			
 			FractalPainter painter = new FractalPainter(600,500);
-			Design design = new Design(Color.BLUE);
+			initLibrary();
+			Design design = new Design(Color.BLUE,DesignTemplateLibrary.library().getTemplate("square"));
 			getContentPane().add(new FractalComponent(painter,design));
 			painter.startDrawing();
 
@@ -37,6 +40,14 @@ public class OverallFrame extends JFrame {
 				System.exit(0);
 			}
 		});
+	}
+
+	protected void initLibrary() {
+		DesignTemplate squareTemplate = new DesignTemplate("square");
+		DesignTemplate circleTemplate = new DesignTemplate("circle");
+		DesignTemplateLibrary.library().addTemplate(squareTemplate);
+		DesignTemplateLibrary.library().addTemplate(circleTemplate);
+		
 	}
 
 	private static void createAndShowGUI() {

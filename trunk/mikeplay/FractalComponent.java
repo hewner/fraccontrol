@@ -19,7 +19,7 @@ public class FractalComponent extends JComponent {
 		currentDesign = cur;
 		painter.addDesign("start", currentDesign);
 		painter.setStartRule("start");
-		Design design = new Design(Color.GREEN);
+		Design design = new Design(Color.GREEN,DesignTemplateLibrary.library().getTemplate("square"));
 		painter.addDesign("sub", design);
 		mouse = new MouseControl();
 		addMouseListener(mouse);
