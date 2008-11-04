@@ -11,7 +11,7 @@ public class FractalComponent extends JComponent {
 	
 	protected FractalPainter painter;
 	protected Design currentDesign;
-	
+	protected MouseControl mouse;
 	public FractalComponent(FractalPainter p, Design cur) {
 		painter = p;
 		currentDesign = cur;
@@ -19,7 +19,7 @@ public class FractalComponent extends JComponent {
 		painter.setStartRule("start");
 		Design design = new Design(Color.GREEN);
 		painter.addDesign("sub", design);
-		MouseControl mouse = new MouseControl();
+		mouse = new MouseControl();
 		addMouseListener(mouse);
 		addMouseMotionListener(mouse);
 		ActionListener repaintListener  = new ActionListener() {
@@ -43,6 +43,7 @@ public class FractalComponent extends JComponent {
 	}
 	public void paintComponent(Graphics graph) {
 		painter.drawCurrentImage(graph);
+		mouse.drawPreview((Graphics2D) graph, painter);
 	}
 	
 	public Design currentDesign() {
