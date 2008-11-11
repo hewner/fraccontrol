@@ -8,37 +8,40 @@ import javax.swing.JComponent;
 
 public class RuleMenu extends JComponent implements KeyListener {
 	public static final int SPACING = 10;
-	public static final int BOX_WIDTH = 180;
+	public static final int BOX_WIDTH =  80;
 	public static final int BOX_HEIGHT = 80;
-	protected int selection = 0;
+	protected ArtistState artist;
 
-	public RuleMenu() {
+	public RuleMenu(ArtistState artist) {
 		addKeyListener(this);
+		this.artist = artist;
 	}
 	
 	public void setSelection(int i) {
-		selection = i;
+		artist.setCurrentTemplate(i);
 	}
 	public void paintComponent(Graphics g) {
-		g.setColor(new Color((float).4,(float).4, (float) .4, (float) .9));
-		g.fillRect(0, 0, getWidth(),getHeight());		
+		int selection = artist.getCurrentTemplateNum();
+		g.setColor(new Color((float).4,(float).4, (float) .4, (float) 1));
+		g.fillRect(0, 0, BOX_WIDTH+2*SPACING,getHeight());		
 		g.setColor(new Color((float).8,(float).8, (float) .8, (float) .5));
-		g.fillRect(0, SPACING/2+(BOX_HEIGHT+SPACING)*selection, getWidth(), BOX_HEIGHT+SPACING);
+		g.fillRect(0, SPACING/2+(BOX_HEIGHT+SPACING)*selection, BOX_WIDTH+2*SPACING, BOX_HEIGHT+SPACING);
 		g.setColor(new Color((float)0,(float)0, (float) 0, (float) 1));
 		int i = 0;
-		for(DesignTemplate template : DesignTemplateLibrary.library().getTemplates()) {
-			g.setColor(new Color((float)0,(float)0, (float) 0, (float) 1));
-			g.fillRect(SPACING, SPACING+(BOX_HEIGHT+SPACING)*i, BOX_WIDTH, BOX_HEIGHT);
-			g.setColor(Color.white);
-			g.drawString(template.getName(), 2*SPACING, 3*SPACING+(BOX_HEIGHT+SPACING)*i);
+		for(DesignTemplate template : artist.getTemplates()) {
+			Graphics2D current = (Graphics2D) g.create();
+			current.translate(SPACING, SPACING+(BOX_HEIGHT+SPACING)*i);
+			current.scale(BOX_WIDTH, BOX_HEIGHT);
+			current.setColor(new Color((float)0,(float)0, (float) 0, (float) 1));
+			current.fillRect(0, 0, 1, 1);
+			current.translate(0.05, .05);
+			current.scale(0.9,0.9);
+			current.setColor(Color.white);
+			current.fill(template.getShape());
+			current.drawString(template.getName(), 2*SPACING, 3*SPACING+(BOX_HEIGHT+SPACING)*i);
 			i++;
 		}
 
-	}
-	
-	public int maxSelection() {
-		return DesignTemplateLibrary.library().getTemplates().size() - 1;
-		
 	}
 	
 	public void keyPressed(KeyEvent e) {
@@ -50,12 +53,12 @@ public class RuleMenu extends JComponent implements KeyListener {
 		
 	}
 	public void keyTyped(KeyEvent e) {
-		if(e.getKeyChar() == 'a' && selection > 0) {
-			selection--;
+		if(e.getKeyChar() == 'a') {
+			artist.decrementTemplate();
 			repaint();
 		}
-		if(e.getKeyChar() == 'z' && selection < maxSelection()) {
-			selection++;
+		if(e.getKeyChar() == 'z') {
+			artist.incrementTemplate();
 			repaint();
 		}
 		if(e.getKeyChar() == 'q') {

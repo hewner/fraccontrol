@@ -12,27 +12,13 @@ import java.util.List;
 public class Design {
 	
 	protected Color background;
-	protected List<Subdesign> subDesigns;
+	protected List<DesignBounds> subDesigns;
 	protected Area subDesignArea;
 	protected DesignTemplate template;
 	
-	protected class Subdesign {
-		public String name;
-		public AffineTransform trans;
-		public Subdesign(String name, AffineTransform trans) {
-			this.name = name;
-			this.trans = trans;
-		}
-	}
-	
-	public static Shape rect = new Rectangle2D.Double(0,0,1.0,1.0);
-	public Shape getShadow() {
-		return rect;
-	}
-	
 	public Design(Color background, DesignTemplate t) {
 		this.background = background;
-		subDesigns = new LinkedList<Subdesign>();
+		subDesigns = new LinkedList<DesignBounds>();
 		subDesignArea = new Area();
 		template = t;
 		DesignTemplateLibrary.library().addDesign(this);
@@ -40,35 +26,31 @@ public class Design {
 	
 	public void draw(Graphics2D g, FractalPainter painter) {
 		g.setColor(background);
-		Shape rect = getShadow(); 
+		Shape rect = template.getShape(); 
 		if(!rect.intersects(g.getClipBounds())) {
 			//this shape is not on screen
 			return;
 		}
 		g.fill(rect);
 		Graphics2D newG;
-		for(Subdesign sub : subDesigns) {
+		for(DesignBounds sub : subDesigns) {
 			newG = (Graphics2D) g.create();
-			AffineTransform newT = new AffineTransform(sub.trans);
+			AffineTransform newT = new AffineTransform(sub.transform());
 			AffineTransform oldT = newG.getTransform();
 			newT.preConcatenate(oldT);
 			newG.setTransform(newT);
-			newG.getTransform().preConcatenate(sub.trans);
-			try {
-				painter.addTask(sub.name, newG);
-			} catch (FractalPainter.RenderingException e) {
-				System.err.println("Caught rendering exception for task: " + sub.name);
-				System.err.println("Attempting to continue...");
-			}
+			newG.getTransform().preConcatenate(sub.transform());
+			
+			Design subDesign = DesignTemplateLibrary.library().getRandomDesign(sub.getTemplate());
+			painter.addTask(subDesign, newG);
 			
 		}
 	}
 	
 	public void addSubdesign(DesignBounds shape) {
 		setRightScale(shape);
-		Subdesign sub = new Subdesign("sub", shape.transform());
 		subDesignArea.add(shape.computeArea());
-		subDesigns.add(sub);
+		subDesigns.add(shape);
 	}
 	
 	public boolean fits(DesignBounds shape) {

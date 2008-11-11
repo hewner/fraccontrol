@@ -8,20 +8,24 @@ import java.awt.geom.Rectangle2D;
 
 
 public class DesignBounds {
-	protected Shape shape;
 	protected AffineTransform trans;
 	protected double scale, rotation;
 	protected Point2D center;
+	protected DesignTemplate template;
 
-	public DesignBounds(Point2D center, double scale, double rotation) {
+	public DesignBounds(Point2D center, double scale, double rotation, DesignTemplate t) {
 		this.center = center;
 		this.scale = scale;
 		this.rotation = rotation;
-		this.shape = new Rectangle2D.Double(0,0,1.0,1.0);
+		this.template = t;
 	}
 	
-	public DesignBounds(Point2D center) {
-		this(center,0,0);
+	public DesignTemplate getTemplate() {
+		return template;
+	}
+	
+	public DesignBounds(Point2D center, DesignTemplate t) {
+		this(center,0,0,t);
 	}
 	
 	public void transformGraphics(Graphics2D g) {
@@ -30,7 +34,7 @@ public class DesignBounds {
 	
 	public void draw(Graphics2D g) {
 		if(scale != 0) {
-			g.fill(shape);
+			g.fill(template.getShape());
 		}
 	}
 	
@@ -65,7 +69,7 @@ public class DesignBounds {
 	}
 	
 	public Area computeArea() {
-		Area area = new Area(shape);
+		Area area = new Area(template.getShape());
 		area.transform(transform());
 		return area;
 	}

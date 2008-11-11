@@ -12,7 +12,12 @@ import java.awt.geom.Rectangle2D;
 
 public class MouseControl implements MouseListener, MouseMotionListener {
 	
-	public DesignBounds preview;
+	protected DesignBounds preview;
+	protected ArtistState artist;
+
+	public MouseControl(ArtistState artist) {
+		this.artist = artist;
+	}
 	
 	public void drawPreview(Graphics2D g, FractalPainter painter) {
 		if(preview != null) {
@@ -24,30 +29,17 @@ public class MouseControl implements MouseListener, MouseMotionListener {
 		}
 	}
 	
-	public void mouseClicked(MouseEvent e) {
-	}
+	public void mouseClicked(MouseEvent e) { }
 
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
+	public void mouseEntered(MouseEvent e) { }
 
-	}
-
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
+	public void mouseExited(MouseEvent e) { }
 
 	public void mouseDragged(MouseEvent e) {
 		FractalComponent component = (FractalComponent) e.getSource();
 		updatePreviewShape(e, component);
 		component.currentDesign().transformSubdesign(preview);
-		//previewTrans = newTrans;
-		//component.currentDesign().addSubdesign("sub",localPoint);
-		//component.painter().redrawAll();
 		component.repaint();
-
-		// TODO Auto-generated method stub
-
 	}
 
 	private void updatePreviewShape(MouseEvent e, FractalComponent component) {
@@ -57,7 +49,7 @@ public class MouseControl implements MouseListener, MouseMotionListener {
 		try {
 			Point2D localPoint = viewTrans.inverseTransform(e.getPoint(),null);
 			if(preview == null) {
-				preview = new DesignBounds(localPoint);
+				preview = new DesignBounds(localPoint, artist.getCurrentTemplate());
 				return;
 			}
 			double dis = preview.getCenter().distance(localPoint);
