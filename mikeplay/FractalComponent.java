@@ -14,14 +14,14 @@ public class FractalComponent extends JComponent {
 	protected Design currentDesign;
 	protected MouseControl mouse;
 	
-	public FractalComponent(FractalPainter p, Design cur) {
+	public FractalComponent(FractalPainter p, Design cur, ArtistState artist) {
 		painter = p;
 		currentDesign = cur;
 		painter.addDesign("start", currentDesign);
 		painter.setStartRule("start");
 		Design design = new Design(Color.GREEN,DesignTemplateLibrary.library().getTemplate("square"));
 		painter.addDesign("sub", design);
-		mouse = new MouseControl();
+		mouse = new MouseControl(artist);
 		addMouseListener(mouse);
 		addMouseMotionListener(mouse);
 		ActionListener repaintListener  = new ActionListener() {

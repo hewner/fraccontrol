@@ -135,9 +135,9 @@ public class FractalPainter {
 	}
 
 	public static final int maxRules = 10000;
-	public synchronized void  addTask(String name, Graphics2D newG) throws RenderingException {
+	public synchronized void  addTask(Design design, Graphics2D newG) {
 		if(toDraw.size() < maxRules) {
-			toDraw.add(new Pair(newG, getDesign(name)));
+			toDraw.add(new Pair(newG, design));
 		} else {
 			System.err.println("Exceeded toDraw max!");
 		}

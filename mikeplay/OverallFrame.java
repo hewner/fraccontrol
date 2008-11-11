@@ -2,6 +2,8 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
@@ -14,12 +16,15 @@ public class OverallFrame extends JFrame {
 		super("FracControl");
 		
 		setSize(600,500);
+		ArtistState artist = new ArtistState();
 		try {
 			
 			FractalPainter painter = new FractalPainter(600,500);
 			initLibrary();
 			Design design = new Design(Color.BLUE,DesignTemplateLibrary.library().getTemplate("square"));
-			getContentPane().add(new FractalComponent(painter,design));
+			new Design(Color.RED,DesignTemplateLibrary.library().getTemplate("circle"));
+			new Design(Color.YELLOW,DesignTemplateLibrary.library().getTemplate("triangle"));
+			getContentPane().add(new FractalComponent(painter,design,artist));
 			painter.startDrawing();
 
 		} catch (FractalPainter.RenderingException e) {
@@ -28,7 +33,7 @@ public class OverallFrame extends JFrame {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		final RuleMenu ruleMenu = new RuleMenu();
+		final RuleMenu ruleMenu = new RuleMenu(artist);
 		getLayeredPane().setLayer(ruleMenu, JLayeredPane.PALETTE_LAYER);
 		getLayeredPane().add(ruleMenu);
 		addKeyListener(ruleMenu);
@@ -40,13 +45,15 @@ public class OverallFrame extends JFrame {
 				System.exit(0);
 			}
 		});
-	}
+}
 
 	protected void initLibrary() {
-		DesignTemplate squareTemplate = new DesignTemplate("square");
-		DesignTemplate circleTemplate = new DesignTemplate("circle");
+		DesignTemplate squareTemplate = new DesignTemplate("square",new Rectangle2D.Double(0,0,1.0,1.0));
+		DesignTemplate circleTemplate = new DesignTemplate("circle", new Ellipse2D.Double(0,0,1.0,1.0));
+		DesignTemplate triangleTemplate = new DesignTemplate("triangle", new Rectangle2D.Double(0,0,1.0,0.1));
 		DesignTemplateLibrary.library().addTemplate(squareTemplate);
 		DesignTemplateLibrary.library().addTemplate(circleTemplate);
+		DesignTemplateLibrary.library().addTemplate(triangleTemplate);
 		
 	}
 
