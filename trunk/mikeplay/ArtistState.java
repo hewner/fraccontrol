@@ -1,8 +1,10 @@
+import java.awt.geom.AffineTransform;
 import java.util.*;
 
 
 public class ArtistState {
 	protected int templateNum;
+	protected AffineTransform viewTransform;
 	
 	public ArtistState() {
 		templateNum = 0;
@@ -14,6 +16,19 @@ public class ArtistState {
 	
 	public int getCurrentTemplateNum() {
 		return templateNum;
+	}
+	
+	public AffineTransform getViewTransform() {
+		return viewTransform;
+	}
+	
+	public AffineTransform viewTransform(double unitLength) {
+		if(viewTransform == null) {
+			viewTransform = new AffineTransform();
+			viewTransform.scale(unitLength, unitLength);
+			viewTransform.translate(0.05, 0.05);
+		}
+		return viewTransform;
 	}
 	
 	public void incrementTemplate() {

@@ -13,6 +13,7 @@ public class FractalComponent extends JComponent {
 	protected FractalPainter painter;
 	protected Design currentDesign;
 	protected MouseControl mouse;
+	protected GameControl game;
 	
 	public FractalComponent(FractalPainter p, Design cur, ArtistState artist) {
 		painter = p;
@@ -22,6 +23,7 @@ public class FractalComponent extends JComponent {
 		Design design = new Design(Color.GREEN,DesignTemplateLibrary.library().getTemplate("square"));
 		painter.addDesign("sub", design);
 		mouse = new MouseControl(artist);
+		game = new GameControl(artist);
 		addMouseListener(mouse);
 		addMouseMotionListener(mouse);
 		ActionListener repaintListener  = new ActionListener() {
