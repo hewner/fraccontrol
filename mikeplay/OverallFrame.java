@@ -19,7 +19,7 @@ public class OverallFrame extends JFrame {
 		ArtistState artist = new ArtistState();
 		try {
 			
-			FractalPainter painter = new FractalPainter(600,500);
+			FractalPainter painter = new FractalPainter(600,500,artist);
 			initLibrary();
 			Design design = new Design(Color.BLUE,DesignTemplateLibrary.library().getTemplate("square"));
 			new Design(Color.RED,DesignTemplateLibrary.library().getTemplate("circle"));
