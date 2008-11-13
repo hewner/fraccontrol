@@ -80,7 +80,7 @@ public class FractalPainter {
 			int numberDrawn = 0;
 			while(!toDraw.isEmpty() && !shouldStop) {
 				Pair current = toDraw.remove();
-				if(isTooSmall(current.g)) {
+				if(false && isTooSmall(current.g)) {
 					System.out.println("Stopping recurse.  Too small.");
 				} else {
 					current.design.draw(current.g,painter);
