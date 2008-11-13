@@ -6,15 +6,33 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 
 
-public class RuleMenu extends JComponent implements KeyListener {
+public class RuleMenu extends JComponent {
 	public static final int SPACING = 10;
 	public static final int BOX_WIDTH =  80;
 	public static final int BOX_HEIGHT = 80;
 	protected ArtistState artist;
-
-	public RuleMenu(ArtistState artist) {
-		addKeyListener(this);
-		this.artist = artist;
+	public boolean menuHidden;
+	
+	public RuleMenu(ArtistState newArtist) {
+		this.artist = newArtist;
+		menuHidden = false;
+		final RuleMenu parentThis = this;
+		artist.onMenuChange( new Runnable() {
+			
+			public void run() {
+				if(menuHidden != artist.isRuleMenuHidden()) {
+					menuHidden = artist.isRuleMenuHidden();
+					if(menuHidden) {
+						Animation animation = new Animation(1000, new Point(0,600),parentThis);
+						animation.startAnimation();
+					} else {
+						Animation animation = new Animation(1000, new Point(0,0),parentThis);
+						animation.startAnimation();
+					}
+				}
+				repaint();
+			}
+		});
 	}
 	
 	public void setSelection(int i) {
@@ -45,31 +63,5 @@ public class RuleMenu extends JComponent implements KeyListener {
 		
 	}
 	
-	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	public void keyTyped(KeyEvent e) {
-		if(e.getKeyChar() == 'a') {
-			artist.decrementTemplate();
-			repaint();
-		}
-		if(e.getKeyChar() == 'z') {
-			artist.incrementTemplate();
-			repaint();
-		}
-		if(e.getKeyChar() == 'q') {
-			Animation animation = new Animation(1000, new Point(0,600),this);
-			animation.startAnimation();
-		}
-		if(e.getKeyChar() == 'w') {
-			Animation animation = new Animation(1000, new Point(0,0),this);
-			animation.startAnimation();
-		}		
 
-	}
 }

@@ -24,8 +24,14 @@ public class OverallFrame extends JFrame {
 			Design design = new Design(Color.BLUE,DesignTemplateLibrary.library().getTemplate("square"));
 			new Design(Color.RED,DesignTemplateLibrary.library().getTemplate("circle"));
 			new Design(Color.YELLOW,DesignTemplateLibrary.library().getTemplate("triangle"));
-			getContentPane().add(new FractalComponent(painter,design,artist));
-			
+			artist.setCurrentDesign(design);
+			FractalComponent fractalComponent = new FractalComponent(painter,artist); 	
+			getContentPane().add(fractalComponent);
+			MouseControl mouse = new MouseControl(artist);
+			GameControl game = new GameControl(artist, fractalComponent);
+			fractalComponent.addMouseListener(mouse);
+			fractalComponent.addMouseMotionListener(mouse);
+			addKeyListener(mouse);
 			painter.startDrawing();
 
 		} catch (FractalPainter.RenderingException e) {
@@ -37,7 +43,6 @@ public class OverallFrame extends JFrame {
 		final RuleMenu ruleMenu = new RuleMenu(artist);
 		getLayeredPane().setLayer(ruleMenu, JLayeredPane.PALETTE_LAYER);
 		getLayeredPane().add(ruleMenu);
-		addKeyListener(ruleMenu);
 		ruleMenu.setSize(200,getHeight());
 		
 		addWindowListener(new WindowAdapter() {

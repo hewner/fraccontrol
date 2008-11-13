@@ -96,7 +96,7 @@ public class FractalPainter {
 	PaintThread thread;
 	
 	protected void transformView(AffineTransform trans) throws RenderingException {
-		artist.viewTransform(unitLength()).preConcatenate(trans);
+		artist.viewTransform().preConcatenate(trans);
 		redrawAll();
 	}
 	
@@ -106,7 +106,7 @@ public class FractalPainter {
 			while(thread.isAlive()) {} //ensure we have only 1 thread processing
 		}
 		g.setColor(Color.WHITE);
-		g.transform(artist.viewTransform(unitLength()));
+		g.transform(artist.viewTransform());
 		
 		RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, 
 				RenderingHints.VALUE_ANTIALIAS_ON);
@@ -145,19 +145,8 @@ public class FractalPainter {
 		}
 	}
 	
-	public double unitLength() {
-		int min = height > width ? width : height;
-		return .90*min;
-	}
-	
 	public boolean isTooSmall(Graphics2D g) {
 		return(g.getTransform().getScaleX() < .25);
 	}
-
-	public AffineTransform viewTransform() {
-		
-		return artist.viewTransform(unitLength());
-	}
-	
 	
 }

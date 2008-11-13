@@ -3,6 +3,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.*;
 
@@ -14,15 +15,63 @@ public class ArtistState {
 	protected int templateNum;
 	protected AffineTransform viewTransform;
 	protected DesignBounds preview;
+	protected boolean rulemenuHidden;
+	protected List<Runnable> onMenuChange;
+	protected List<Runnable> onViewTransformChange;
+	protected Design currentDesign;
 	//protected FractalComponent component;
 	
 	public ArtistState() {
 		//this.component = component;
 		templateNum = 0;
+		rulemenuHidden = false;
+		onMenuChange = new LinkedList<Runnable>();
+		onViewTransformChange = new LinkedList<Runnable>();
+		viewTransform = new AffineTransform();
+		double unitLength = 500*.9;
+		viewTransform.scale(unitLength, unitLength);
+		viewTransform.translate(0.05, 0.05);
+	}
+	
+	public void onMenuChange(Runnable callback) {
+		onMenuChange.add(callback);
+	}
+	
+	public void onViewTransformChange(Runnable callback) {
+		onViewTransformChange.add(callback);
+	}
+	public void notifyMenuChange() {
+		for(Runnable callback : onMenuChange) {
+			callback.run();
+		}
+		
+	}
+	public void notifyViewTransformChange() {
+		for(Runnable callback : onViewTransformChange) {
+			callback.run();
+		}
+		
+	}
+	
+	public void setCurrentDesign(Design d) {
+		currentDesign = d;
+	}
+	
+	public boolean isRuleMenuHidden() {
+		return rulemenuHidden;
+	}
+	
+	public void toggleRuleMenu() {
+		rulemenuHidden = !rulemenuHidden;
+		notifyMenuChange();
 	}
 	
 	public void setCurrentTemplate(int template) {
-		templateNum = template;
+		if(template < getTemplateCount() &&
+			template >= 0) {
+			templateNum = template;
+			notifyMenuChange();
+		}
 	}
 	
 	public int getCurrentTemplateNum() {
@@ -33,18 +82,14 @@ public class ArtistState {
 		return viewTransform;
 	}
 	
-	public AffineTransform viewTransform(double unitLength) {
-		if(viewTransform == null) {
-			viewTransform = new AffineTransform();
-			viewTransform.scale(unitLength, unitLength);
-			viewTransform.translate(0.05, 0.05);
-		}
+	public AffineTransform viewTransform() {
 		return viewTransform;
 	}
 	
 	public void zoomViewTransform(double zoomFactor) {
 		if(viewTransform != null) {
 			viewTransform.scale(zoomFactor, zoomFactor);
+			notifyViewTransformChange();
 			//System.out.println("zomming"+zoomFactor);
 		}
 	}
@@ -52,21 +97,18 @@ public class ArtistState {
 	public void panViewTransform(double xPan, double yPan) {
 		if(viewTransform != null) {
 			viewTransform.translate(xPan, yPan);
+			notifyViewTransformChange();
 			
 		}
 	}
 	
 	
 	public void incrementTemplate() {
-		if(templateNum != getTemplateCount() - 1) {
-			templateNum++;
-		}
+		setCurrentTemplate(templateNum + 1);
 	}
 	
 	public void decrementTemplate() {
-		if(templateNum != 0) {
-			templateNum--;
-		}
+		setCurrentTemplate(templateNum - 1);
 	}
 	
 	public DesignTemplate getCurrentTemplate() {
@@ -88,33 +130,32 @@ public class ArtistState {
 	public void drawPreview(Graphics2D g, FractalPainter painter) {
 		if(preview != null) {
 			Graphics2D newG = (Graphics2D) g.create();
-			newG.transform(painter.viewTransform());
+			newG.transform(viewTransform());
 			preview.transformGraphics(newG);
 			newG.setColor(Color.PINK);
 			preview.draw(newG);
 		}
 	}
-	public void updatePreviewShape(MouseEvent e, FractalComponent component) {
-		AffineTransform viewTrans = component.painter().viewTransform();
-		//TODO right now we're making the assumption that the 
-		//current selected design is also the outermost design
+	
+	public void startPreview(Point2D center) {
+		preview = new DesignBounds(center, getCurrentTemplate());
+	}
+
+	public void ensurePreviewDoesNotOverlap() {
+		currentDesign.transformSubdesign(getPreview());
+	}
+	
+	public Point2D pointInFractalCoordinates(Point2D point) {
+		 
+		Point2D localPoint = null;
 		try {
-			Point2D localPoint = viewTrans.inverseTransform(e.getPoint(),null);
-			if(preview == null) {
-				preview = new DesignBounds(localPoint, getCurrentTemplate());
-				return;
-			}
-			double dis = preview.getCenter().distance(localPoint);
-			double scale = 2*dis/1.4142;
-			
-			preview.setScale(scale);
-			preview.setRotation(Math.atan2(preview.getCenter().getY()-localPoint.getY(), preview.getCenter().getX()-localPoint.getX())); 			
-			System.out.println("scale="+Math.atan2(preview.getCenter().getY()-localPoint.getY(), preview.getCenter().getX()-localPoint.getX()));
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			preview = null;
+			localPoint = viewTransform().inverseTransform(point,null);
+		} catch (NoninvertibleTransformException e) {
+			System.err.println("Error converting point to local coordinates");
+			e.printStackTrace();
 		}
+		
+		return localPoint;
 	}
 
 	public void setPreview(DesignBounds dB) {
@@ -123,11 +164,11 @@ public class ArtistState {
 	}
 
 	public void updatePreviewShapeGame(JXInputAxisEvent e, FractalComponent component) {
-		AffineTransform viewTrans = component.painter().viewTransform();
+		
 		//TODO right now we're making the assumption that the 
 		//current selected design is also the outermost design
 		try {
-			Point2D localPoint = viewTrans.inverseTransform(getCrosshair(component),null);
+			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
 			if(preview == null) {
 				preview = new DesignBounds(localPoint, getCurrentTemplate());
 				return;
@@ -146,11 +187,10 @@ public class ArtistState {
 	}
 	
 	public void updatePreviewShapeGameButton(JXInputButtonEvent e, FractalComponent component) {
-		AffineTransform viewTrans = component.painter().viewTransform();
 		//TODO right now we're making the assumption that the 
 		//current selected design is also the outermost design
 		try {
-			Point2D localPoint = viewTrans.inverseTransform(getCrosshair(component),null);
+			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
 			if(preview == null) {
 				preview = new DesignBounds(localPoint, getCurrentTemplate());
 				return;
@@ -177,11 +217,10 @@ public class ArtistState {
 	}
 
 	public void updatePreviewShapeGameRotate(JXInputAxisEvent ev, FractalComponent component) {
-		AffineTransform viewTrans = component.painter().viewTransform();
 		//TODO right now we're making the assumption that the 
 		//current selected design is also the outermost design
 		try {
-			Point2D localPoint = viewTrans.inverseTransform(getCrosshair(component),null);
+			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
 			if(preview == null) {
 				preview = new DesignBounds(localPoint, getCurrentTemplate());
 				return;
@@ -195,6 +234,10 @@ public class ArtistState {
 			preview = null;
 		}
 		
+	}
+
+	public Design getCurrentDesign() {
+		return currentDesign;
 	}
 	
 }
