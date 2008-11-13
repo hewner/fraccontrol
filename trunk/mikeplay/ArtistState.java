@@ -14,7 +14,7 @@ public class ArtistState {
 	protected int templateNum;
 	protected AffineTransform viewTransform;
 	protected DesignBounds preview;
-	protected FractalComponent component;
+	//protected FractalComponent component;
 	
 	public ArtistState() {
 		//this.component = component;
@@ -106,9 +106,10 @@ public class ArtistState {
 			}
 			double dis = preview.getCenter().distance(localPoint);
 			double scale = 2*dis/1.4142;
+			
 			preview.setScale(scale);
 			preview.setRotation(Math.atan2(preview.getCenter().getY()-localPoint.getY(), preview.getCenter().getX()-localPoint.getX())); 			
-			
+			System.out.println("scale="+Math.atan2(preview.getCenter().getY()-localPoint.getY(), preview.getCenter().getX()-localPoint.getX()));
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -132,9 +133,9 @@ public class ArtistState {
 				return;
 			}
 			double dis = e.getAxis().getValue();
-			double scale = 2*dis/1.4142;
+			double scale = (1+dis)/2;
 			preview.setScale(scale);
-			//preview.setRotation(Math.atan2(preview.getCenter().getY()-localPoint.getY(), preview.getCenter().getX()-localPoint.getX())); 			
+			//System.out.println("scale="+scale); 			
 			
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
@@ -163,13 +164,16 @@ public class ArtistState {
 		
 	}
 	
-	private Point getCrosshair(FractalComponent component) {
-		int width = component.getWidth();
-		int height = component.getHeight();
-				
-		Point center = new Point(width/2, height/2);
-		
-		return center; 
+	public Point getCrosshair(FractalComponent component) {
+		if(component != null) {
+			int width = component.getWidth();
+			int height = component.getHeight();
+					
+			Point center = new Point(width/2, height/2);
+			
+			return center;
+		}
+		return null;
 	}
 
 	public void updatePreviewShapeGameRotate(JXInputAxisEvent ev, FractalComponent component) {
@@ -183,7 +187,7 @@ public class ArtistState {
 				return;
 			}
 			
-			preview.setRotation(ev.getDelta()); 			
+			preview.setRotation(3*ev.getAxis().getValue()); 			
 			
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
