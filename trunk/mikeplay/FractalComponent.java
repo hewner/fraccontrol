@@ -11,28 +11,32 @@ import javax.swing.Timer;
 public class FractalComponent extends JComponent {
 	
 	protected FractalPainter painter;
-	protected Design currentDesign;
-	protected MouseControl mouse;
-	protected GameControl game;
 	protected ArtistState artist;
 	
-	public FractalComponent(FractalPainter p, Design cur, ArtistState artist) {
+	public FractalComponent(FractalPainter p, ArtistState artist) {
 		this.artist = artist;
 		painter = p;
-		currentDesign = cur;
-		painter.addDesign("start", currentDesign);
+		painter.addDesign("start", artist.getCurrentDesign());
 		painter.setStartRule("start");
 		Design design = new Design(Color.GREEN,DesignTemplateLibrary.library().getTemplate("square"));
 		painter.addDesign("sub", design);
-		mouse = new MouseControl(artist);
-		game = new GameControl(artist, this);
-		addMouseListener(mouse);
-		addMouseMotionListener(mouse);
+
 		ActionListener repaintListener  = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				repaint();
 			}			
 		};
+		
+		artist.onViewTransformChange(new Runnable() {
+			public void run() {
+				try {
+					painter.redrawAll();
+				} catch (FractalPainter.RenderingException e) {
+					System.err.println("Error after view transform change");
+					e.printStackTrace();
+				}
+			}
+		});
 		Timer timer = new Timer(100,repaintListener);
 		timer.start();
 	}
@@ -59,10 +63,6 @@ public class FractalComponent extends JComponent {
 		
 		
 
-	}
-	
-	public Design currentDesign() {
-		return currentDesign;
 	}
 	
 	public FractalPainter painter() {

@@ -3,5 +3,6 @@
 	<classpathentry kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/De"/>
+	<classpathentry kind="lib" path="/home/hewner/Desktop/JXInput_0.3.4/jxinput.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

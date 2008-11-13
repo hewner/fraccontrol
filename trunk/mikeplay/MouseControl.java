@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -10,7 +12,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 
-public class MouseControl implements MouseListener, MouseMotionListener {
+public class MouseControl implements MouseListener, MouseMotionListener, KeyListener  {
 	
 	
 	protected ArtistState artist;
@@ -19,56 +21,35 @@ public class MouseControl implements MouseListener, MouseMotionListener {
 		this.artist = artist;
 	}
 	
-	
-	
 	public void mouseClicked(MouseEvent e) { }
 
 	public void mouseEntered(MouseEvent e) { }
 
 	public void mouseExited(MouseEvent e) { }
 
+	
 	public void mouseDragged(MouseEvent e) {
 		FractalComponent component = (FractalComponent) e.getSource();
-		artist.updatePreviewShape(e, component);
-		component.currentDesign().transformSubdesign(artist.getPreview());
+		Point2D localPoint = artist.pointInFractalCoordinates(e.getPoint());
+		updatePreviewForRadius(localPoint);
+		artist.ensurePreviewDoesNotOverlap();
 		component.repaint();
 	}
-	
-//	public void drawPreview(Graphics2D g, FractalPainter painter) {
-//		if(preview != null) {
-//			Graphics2D newG = (Graphics2D) g.create();
-//			newG.transform(painter.viewTransform());
-//			preview.transformGraphics(newG);
-//			newG.setColor(Color.PINK);
-//			preview.draw(newG);
-//		}
-//	}
-//	private void updatePreviewShape(MouseEvent e, FractalComponent component) {
-//		AffineTransform viewTrans = component.painter().viewTransform();
-//		//TODO right now we're making the assumption that the 
-//		//current selected design is also the outermost design
-//		try {
-//			Point2D localPoint = viewTrans.inverseTransform(e.getPoint(),null);
-//			if(preview == null) {
-//				preview = new DesignBounds(localPoint, artist.getCurrentTemplate());
-//				return;
-//			}
-//			double dis = preview.getCenter().distance(localPoint);
-//			double scale = 2*dis/1.4142;
-//			preview.setScale(scale);
-//			preview.setRotation(Math.atan2(preview.getCenter().getY()-localPoint.getY(), preview.getCenter().getX()-localPoint.getX())); 			
-//			
-//		} catch (Exception e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//			preview = null;
-//		}
-//	}
+
+	private void updatePreviewForRadius(Point2D localPoint) {
+		DesignBounds preview = artist.getPreview();
+		double dis = preview.getCenter().distance(localPoint);
+		double scale = 2*dis/1.4142;
+			
+		preview.setScale(scale);
+		preview.setRotation(Math.atan2(preview.getCenter().getY()-localPoint.getY(), preview.getCenter().getX()-localPoint.getX()));
+	}
 
 	public void mouseReleased(MouseEvent e) {
 		FractalComponent component = (FractalComponent) e.getSource();
-		artist.updatePreviewShape(e, component);
-		component.currentDesign().addSubdesign(artist.getPreview());
+		Point2D localPoint = artist.pointInFractalCoordinates(e.getPoint());
+		updatePreviewForRadius(localPoint);
+		artist.getCurrentDesign().addSubdesign(artist.getPreview());
 		artist.setPreview(null);
 		try {
 			component.painter().redrawAll();
@@ -80,12 +61,39 @@ public class MouseControl implements MouseListener, MouseMotionListener {
 	}
 
 	public void mousePressed(MouseEvent e) {
-		
+		artist.startPreview(artist.pointInFractalCoordinates(e.getPoint()));
 	}
 
-	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void mouseMoved(MouseEvent e) { }
+	
+	public void keyPressed(KeyEvent e) { }
+	
+	public void keyReleased(KeyEvent e) { }
+	
+	public void keyTyped(KeyEvent e) {
+	
+		if(e.getKeyChar() == 'a') {
+			artist.decrementTemplate();
+		}
+		if(e.getKeyChar() == 'z') {
+			artist.incrementTemplate();
+		}
+		if(e.getKeyChar() == 'q') {
+			artist.toggleRuleMenu();
+		}
+		if(e.getKeyChar() == 'l') {
+			artist.panViewTransform(-.05, 0);
+		}
+		if(e.getKeyChar() == 'h') {
+			artist.panViewTransform(0.05, 0);
+		}
+		if(e.getKeyChar() == 'j') {
+			artist.panViewTransform(0, -.05);
+		}
+		if(e.getKeyChar() == 'k') {
+			artist.panViewTransform(0, .05);
+		}
+
 	}
 
 }

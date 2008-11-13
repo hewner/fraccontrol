@@ -64,7 +64,7 @@ public class GameControl implements JXInputAxisEventListener,
 		if(ev.getAxis() == dev.getAxis(0)) { //if x axis do scale function
 			//if((ev.getAxis().getValue()>0 && ev.getDelta()>0) || (ev.getAxis().getValue()<0 && ev.getDelta()<0)) {
 				artist.updatePreviewShapeGame(ev, component);
-				component.currentDesign().transformSubdesign(artist.getPreview());
+				artist.getCurrentDesign().transformSubdesign(artist.getPreview());
 				component.repaint();
 			//}
 		}
@@ -72,7 +72,7 @@ public class GameControl implements JXInputAxisEventListener,
 		if(ev.getAxis() == dev.getAxis(1)) { //if y axis do rotate function
 			//if((ev.getAxis().getValue()>0 && ev.getDelta()>0) || (ev.getAxis().getValue()<0 && ev.getDelta()<0)) {
 				artist.updatePreviewShapeGameRotate(ev, component);
-				component.currentDesign().transformSubdesign(artist.getPreview());
+				artist.getCurrentDesign().transformSubdesign(artist.getPreview());
 				component.repaint();
 			//}
 		}
@@ -127,7 +127,7 @@ public class GameControl implements JXInputAxisEventListener,
 		if(ev.getButton() == dev.getButton(0)) {
 			if(ev.getButton().getState()) {
 				artist.updatePreviewShapeGameButton(ev, component);
-				component.currentDesign().addSubdesign(artist.getPreview());
+				artist.getCurrentDesign().addSubdesign(artist.getPreview());
 			} else {
 				artist.setPreview(null);
 				try {
@@ -141,7 +141,6 @@ public class GameControl implements JXInputAxisEventListener,
 		
 	}
 
-	@Override
 	public void changed(JXInputDirectionalEvent ev) {
 		System.out.println( "Directional " + ev.getDirectional().getName() + " changed : direction=" + ev.getDirectional().getDirection()+"value="+ev.getDirectional().getValue()+"delta=" + ev.getDirectionDelta());
 		if(ev.getDirectional().getDirection()==18000 && ev.getDirectional().getValue()==1) {
@@ -152,5 +151,6 @@ public class GameControl implements JXInputAxisEventListener,
 		}
 		
 	}
+
 
 }
