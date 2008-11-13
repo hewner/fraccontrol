@@ -25,6 +25,7 @@ public class OverallFrame extends JFrame {
 			new Design(Color.RED,DesignTemplateLibrary.library().getTemplate("circle"));
 			new Design(Color.YELLOW,DesignTemplateLibrary.library().getTemplate("triangle"));
 			getContentPane().add(new FractalComponent(painter,design,artist));
+			
 			painter.startDrawing();
 
 		} catch (FractalPainter.RenderingException e) {
