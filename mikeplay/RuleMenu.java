@@ -41,7 +41,8 @@ public class RuleMenu extends JComponent implements KeyListener {
 			current.drawString(template.getName(), 2*SPACING, 3*SPACING+(BOX_HEIGHT+SPACING)*i);
 			i++;
 		}
-
+		
+		
 	}
 	
 	public void keyPressed(KeyEvent e) {

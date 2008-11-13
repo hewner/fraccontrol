@@ -62,16 +62,19 @@ public class GameControl implements JXInputAxisEventListener,
 		//System.out.println( "Axis " + ev.getAxis().getName() + " changed : value=" + ev.getAxis().getValue() + ", event causing delta=" + ev.getDelta() );
 		
 		if(ev.getAxis() == dev.getAxis(0)) { //if x axis do scale function
-			
-			artist.updatePreviewShapeGame(ev, component);
-			component.currentDesign().transformSubdesign(artist.getPreview());
-			component.repaint();
+			//if((ev.getAxis().getValue()>0 && ev.getDelta()>0) || (ev.getAxis().getValue()<0 && ev.getDelta()<0)) {
+				artist.updatePreviewShapeGame(ev, component);
+				component.currentDesign().transformSubdesign(artist.getPreview());
+				component.repaint();
+			//}
 		}
 		
 		if(ev.getAxis() == dev.getAxis(1)) { //if y axis do rotate function
-			artist.updatePreviewShapeGameRotate(ev, component);
-			component.currentDesign().transformSubdesign(artist.getPreview());
-			component.repaint();
+			//if((ev.getAxis().getValue()>0 && ev.getDelta()>0) || (ev.getAxis().getValue()<0 && ev.getDelta()<0)) {
+				artist.updatePreviewShapeGameRotate(ev, component);
+				component.currentDesign().transformSubdesign(artist.getPreview());
+				component.repaint();
+			//}
 		}
 		
 		if(ev.getAxis() == dev.getAxis(2)) {  //if z axis do zoom function
@@ -122,27 +125,31 @@ public class GameControl implements JXInputAxisEventListener,
 		
 		
 		if(ev.getButton() == dev.getButton(0)) {
-			artist.updatePreviewShapeGameButton(ev, component);
-			component.currentDesign().addSubdesign(artist.getPreview());
-		}
-		
-		if(ev.getButton() == dev.getButton(1)) {	
-			artist.setPreview(null);
-		}
-		
-		
-		try {
-			component.painter().redrawAll();
-		} catch (FractalPainter.RenderingException e1) {
-			System.err.println("Rendering exception adding new subcomponent");
-			e1.printStackTrace();
+			if(ev.getButton().getState()) {
+				artist.updatePreviewShapeGameButton(ev, component);
+				component.currentDesign().addSubdesign(artist.getPreview());
+			} else {
+				artist.setPreview(null);
+				try {
+					component.painter().redrawAll();
+				} catch (FractalPainter.RenderingException e1) {
+					System.err.println("Rendering exception adding new subcomponent");
+					e1.printStackTrace();
+				}
+			}
 		}
 		
 	}
 
 	@Override
 	public void changed(JXInputDirectionalEvent ev) {
-		System.out.println( "Directional " + ev.getDirectional().getName() + " changed : direction=" + ev.getDirectional().getDirection()+"value="+ev.getDirectional().getValue());
+		System.out.println( "Directional " + ev.getDirectional().getName() + " changed : direction=" + ev.getDirectional().getDirection()+"value="+ev.getDirectional().getValue()+"delta=" + ev.getDirectionDelta());
+		if(ev.getDirectional().getDirection()==18000 && ev.getDirectional().getValue()==1) {
+			artist.incrementTemplate();
+		}
+		if(ev.getDirectional().getDirection()==0 && ev.getDirectional().getValue()==1) {
+			artist.decrementTemplate();
+		}
 		
 	}
 

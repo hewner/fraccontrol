@@ -50,6 +50,15 @@ public class FractalComponent extends JComponent {
 	public void paintComponent(Graphics graph) {
 		painter.drawCurrentImage(graph);
 		artist.drawPreview((Graphics2D) graph, painter);
+		//draw crosshair
+		graph.setColor(Color.white);
+		Point ch = artist.getCrosshair(this);
+		
+		graph.drawLine(ch.x, ch.y-5, ch.x, ch.y+5); //vertical line
+		graph.drawLine(ch.x-5, ch.y, ch.x+5, ch.y); //horizontal line
+		
+		
+
 	}
 	
 	public Design currentDesign() {
