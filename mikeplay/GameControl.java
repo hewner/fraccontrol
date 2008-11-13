@@ -1,3 +1,10 @@
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+
+import javax.swing.Timer;
+
 import de.hardcode.jxinput.Axis;
 import de.hardcode.jxinput.Button;
 import de.hardcode.jxinput.Directional;
@@ -19,6 +26,8 @@ public class GameControl implements JXInputAxisEventListener,
 	protected DesignBounds preview;
 	protected ArtistState artist;
 	protected FractalComponent component;
+	protected Point2D cursor;
+	protected Timer timer;
 
 	
 	public GameControl(ArtistState artist, FractalComponent component) {
@@ -56,25 +65,27 @@ public class GameControl implements JXInputAxisEventListener,
 	
 	
 	
+	public Point2D getCrosshair() {
+
+		double width = component.getWidth();
+		double height = component.getHeight();
+					
+		Point2D center = new Point.Double(width/2, height/2);
+			return center;
+		//return artist.pointInFractalCoordinates(center);
+
+	}
 
 
 	public void changed(JXInputAxisEvent ev) {
 		//System.out.println( "Axis " + ev.getAxis().getName() + " changed : value=" + ev.getAxis().getValue() + ", event causing delta=" + ev.getDelta() );
 		
 		if(ev.getAxis() == dev.getAxis(0)) { //if x axis do scale function
-			//if((ev.getAxis().getValue()>0 && ev.getDelta()>0) || (ev.getAxis().getValue()<0 && ev.getDelta()<0)) {
-				artist.updatePreviewShapeGame(ev, component);
-				artist.getCurrentDesign().transformSubdesign(artist.getPreview());
-				component.repaint();
-			//}
+			//positionPadChanged();
 		}
 		
 		if(ev.getAxis() == dev.getAxis(1)) { //if y axis do rotate function
-			//if((ev.getAxis().getValue()>0 && ev.getDelta()>0) || (ev.getAxis().getValue()<0 && ev.getDelta()<0)) {
-				artist.updatePreviewShapeGameRotate(ev, component);
-				artist.getCurrentDesign().transformSubdesign(artist.getPreview());
-				component.repaint();
-			//}
+			//positionPadChanged();
 		}
 		
 		if(ev.getAxis() == dev.getAxis(2)) {  //if z axis do zoom function
@@ -92,9 +103,9 @@ public class GameControl implements JXInputAxisEventListener,
 		
 		if(ev.getAxis() == dev.getAxis(3)) {  //if x axis rotation do pan function
 			if(ev.getAxis().getValue()>0 && ev.getDelta()>0)
-				artist.panViewTransform(ev.getDelta(), 0);
+				artist.panViewTransform(ev.getDelta()/10, 0);
 			if(ev.getAxis().getValue()<0 && ev.getDelta()<0)
-				artist.panViewTransform(ev.getDelta(), 0);
+				artist.panViewTransform(ev.getDelta()/10, 0);
 			try {
 				component.painter().redrawAll();
 			} catch (FractalPainter.RenderingException e1) {
@@ -119,25 +130,66 @@ public class GameControl implements JXInputAxisEventListener,
 	}
 
 
+	
+
 	public void changed(JXInputButtonEvent ev) {
 		System.out.println( "Button " + ev.getButton().getName() + " changed : state=" + ev.getButton().getState() );
 		
 		
 		
 		if(ev.getButton() == dev.getButton(0)) {
-			if(ev.getButton().getState()) {
-				artist.updatePreviewShapeGameButton(ev, component);
-				artist.getCurrentDesign().addSubdesign(artist.getPreview());
-			} else {
-				artist.setPreview(null);
-				try {
-					component.painter().redrawAll();
-				} catch (FractalPainter.RenderingException e1) {
-					System.err.println("Rendering exception adding new subcomponent");
-					e1.printStackTrace();
-				}
+			if(ev.getButton().getState()) { //button down
+				onButtonADown();
+				
+			} else { //button up
+				onButtonAUp();
 			}
 		}
+		
+	}
+
+	private void onButtonAUp() {
+//		double xPosition = dev.getAxis(0).getValue() +artist.getPreview().getCenter().getX();
+//		double yPosition = dev.getAxis(1).getValue() +artist.getPreview().getCenter().getY();
+//		
+//		Point2D localPoint = new Point2D.Double(xPosition, yPosition);
+		timer.stop();
+		artist.updatePreview(getCrosshair(),cursor);
+		artist.getCurrentDesign().addSubdesign(artist.getPreview());
+		artist.setPreview(null);
+		try {
+			component.painter().redrawAll();
+		} catch (FractalPainter.RenderingException e1) {
+			System.err.println("Rendering exception adding new subcomponent");
+			e1.printStackTrace();
+		}
+		
+		
+	}
+
+	private void onButtonADown() {
+		artist.startPreview(artist.pointInFractalCoordinates(getCrosshair()));
+		timer = new Timer(100, new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				updateCursor();
+			}
+
+		});
+		cursor = new Point2D.Double(artist.getPreview().getCenter().getX(),artist.getPreview().getCenter().getY());
+		timer.start();
+	}
+	
+	private void updateCursor() {
+
+		double xPosition = dev.getAxis(0).getValue();
+		double yPosition = dev.getAxis(1).getValue();
+		if(Math.abs(xPosition) < .2 && Math.abs(yPosition) < .2)
+			return;
+		cursor.setLocation(xPosition/50+cursor.getX(), yPosition/50+cursor.getY());
+		artist.updatePreview(getCrosshair(), cursor);
+		
+		component.repaint();
 		
 	}
 

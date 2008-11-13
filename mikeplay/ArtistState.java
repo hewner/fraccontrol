@@ -127,6 +127,22 @@ public class ArtistState {
 		return preview;
 	}
 	
+	private void updatePreviewForRadius(Point2D localPoint) {
+		
+		double dis = preview.getCenter().distance(localPoint);
+		double scale = 2*dis/1.4142;
+		
+		preview.setScale(scale);
+		preview.setRotation(Math.atan2(preview.getCenter().getY()-localPoint.getY(), preview.getCenter().getX()-localPoint.getX()));
+		System.out.println(preview.getCenter());
+	}
+	
+	public void updatePreview(Point2D center, Point2D radius) {
+		System.out.println(center + "  " + radius);
+		updatePreviewForRadius(radius);
+		ensurePreviewDoesNotOverlap();
+	}
+	
 	public void drawPreview(Graphics2D g, FractalPainter painter) {
 		if(preview != null) {
 			Graphics2D newG = (Graphics2D) g.create();
@@ -162,79 +178,69 @@ public class ArtistState {
 		preview = dB;
 		
 	}
-
-	public void updatePreviewShapeGame(JXInputAxisEvent e, FractalComponent component) {
-		
-		//TODO right now we're making the assumption that the 
-		//current selected design is also the outermost design
-		try {
-			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
-			if(preview == null) {
-				preview = new DesignBounds(localPoint, getCurrentTemplate());
-				return;
-			}
-			double dis = e.getAxis().getValue();
-			double scale = (1+dis)/2;
-			preview.setScale(scale);
-			//System.out.println("scale="+scale); 			
-			
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			preview = null;
-		}
-		
-	}
-	
-	public void updatePreviewShapeGameButton(JXInputButtonEvent e, FractalComponent component) {
-		//TODO right now we're making the assumption that the 
-		//current selected design is also the outermost design
-		try {
-			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
-			if(preview == null) {
-				preview = new DesignBounds(localPoint, getCurrentTemplate());
-				return;
-			}
-			
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			preview = null;
-		}
-		
-	}
-	
-	public Point getCrosshair(FractalComponent component) {
-		if(component != null) {
-			int width = component.getWidth();
-			int height = component.getHeight();
-					
-			Point center = new Point(width/2, height/2);
-			
-			return center;
-		}
-		return null;
-	}
-
-	public void updatePreviewShapeGameRotate(JXInputAxisEvent ev, FractalComponent component) {
-		//TODO right now we're making the assumption that the 
-		//current selected design is also the outermost design
-		try {
-			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
-			if(preview == null) {
-				preview = new DesignBounds(localPoint, getCurrentTemplate());
-				return;
-			}
-			
-			preview.setRotation(3*ev.getAxis().getValue()); 			
-			
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			preview = null;
-		}
-		
-	}
+//
+//	public void updatePreviewShapeGame(JXInputAxisEvent e, FractalComponent component) {
+//		
+//		//TODO right now we're making the assumption that the 
+//		//current selected design is also the outermost design
+//		try {
+//			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
+//			if(preview == null) {
+//				preview = new DesignBounds(localPoint, getCurrentTemplate());
+//				return;
+//			}
+//			double dis = e.getAxis().getValue();
+//			double scale = (1+dis)/2;
+//			preview.setScale(scale);
+//			//System.out.println("scale="+scale); 			
+//			
+//		} catch (Exception e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//			preview = null;
+//		}
+//		
+//	}
+//	
+//	public void updatePreviewShapeGameButton(JXInputButtonEvent e, FractalComponent component) {
+//		//TODO right now we're making the assumption that the 
+//		//current selected design is also the outermost design
+//		try {
+//			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
+//			if(preview == null) {
+//				preview = new DesignBounds(localPoint, getCurrentTemplate());
+//				return;
+//			}
+//			
+//		} catch (Exception e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//			preview = null;
+//		}
+//		
+//	}
+//	
+//	
+//
+//	public void updatePreviewShapeGameRotate(JXInputAxisEvent ev, FractalComponent component) {
+//		//TODO right now we're making the assumption that the 
+//		//current selected design is also the outermost design
+//		try {
+//			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
+//			if(preview == null) {
+//				preview = new DesignBounds(localPoint, getCurrentTemplate());
+//				return;
+//			}
+//			
+//			preview.setRotation(3*ev.getAxis().getValue()); 			
+//			
+//		} catch (Exception e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//			preview = null;
+//		}
+//		
+//	}
 
 	public Design getCurrentDesign() {
 		return currentDesign;
