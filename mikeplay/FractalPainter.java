@@ -97,8 +97,9 @@ public class FractalPainter {
 					double newScale = sub.getScale()*current.absoluteScale;
 					if(newScale >= minScale)
 						addTask(subDesign, newG, newScale);
-					else
-						System.out.println("Stopping recurse too small");
+					else {
+						//System.out.println("Stopping recurse too small");
+					}
 
 				}
 				
