@@ -57,6 +57,7 @@ public class ArtistState {
 	
 	public void setCurrentDesign(Design d) {
 		currentDesign = d;
+		notifyViewTransformChange();
 	}
 	
 	public boolean isRuleMenuHidden() {
