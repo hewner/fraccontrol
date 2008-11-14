@@ -24,7 +24,11 @@ public class Design {
 		DesignTemplateLibrary.library().addDesign(this);
 	}
 	
-	public void draw(Graphics2D g, FractalPainter painter) {
+	public List<DesignBounds> getSubdesigns() {
+		return subDesigns;
+	}
+	
+	public void drawBackground(Graphics2D g) {
 		g.setColor(background);
 		Shape rect = template.getShape(); 
 		if(!rect.intersects(g.getClipBounds())) {
@@ -32,19 +36,6 @@ public class Design {
 			return;
 		}
 		g.fill(rect);
-		Graphics2D newG;
-		for(DesignBounds sub : subDesigns) {
-			newG = (Graphics2D) g.create();
-			AffineTransform newT = new AffineTransform(sub.transform());
-			AffineTransform oldT = newG.getTransform();
-			newT.preConcatenate(oldT);
-			newG.setTransform(newT);
-			newG.getTransform().preConcatenate(sub.transform());
-			
-			Design subDesign = DesignTemplateLibrary.library().getRandomDesign(sub.getTemplate());
-			painter.addTask(subDesign, newG);
-			
-		}
 	}
 	
 	public void addSubdesign(DesignBounds shape) {

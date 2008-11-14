@@ -8,6 +8,6 @@ public class DesignInstance {
 	}
 
 	public void draw(Graphics2D g, FractalPainter painter) {
-		baseDesign.draw(g, painter);
+		baseDesign.drawBackground(g);
 	}
 }
