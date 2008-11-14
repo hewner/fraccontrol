@@ -7,8 +7,7 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
-import javax.swing.Timer;
-
+import org.apache.batik.ext.awt.geom.Polygon2D;
 
 public class OverallFrame extends JFrame {
 	
@@ -56,9 +55,13 @@ public class OverallFrame extends JFrame {
 	protected void initLibrary() {
 		DesignTemplate squareTemplate = new DesignTemplate("square",new Rectangle2D.Double(0,0,1.0,1.0));
 		DesignTemplate circleTemplate = new DesignTemplate("circle", new Ellipse2D.Double(0,0,1.0,1.0));
-		DesignTemplate triangleTemplate = new DesignTemplate("triangle", new Rectangle2D.Double(0,0,1.0,0.1));
 		DesignTemplateLibrary.library().addTemplate(squareTemplate);
 		DesignTemplateLibrary.library().addTemplate(circleTemplate);
+		Polygon2D triagle = new Polygon2D();
+		triagle.addPoint(0, 0);
+		triagle.addPoint(1, 0);
+		triagle.addPoint((float).5, (float).866);
+		DesignTemplate triangleTemplate = new DesignTemplate("triangle", triagle);
 		DesignTemplateLibrary.library().addTemplate(triangleTemplate);
 		
 	}

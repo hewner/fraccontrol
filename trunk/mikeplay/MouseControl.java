@@ -86,6 +86,10 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		if(e.getKeyChar() == 'k') {
 			artist.panViewTransform(0, .05);
 		}
+		if(e.getKeyChar() == 'x') {
+			artist.zoomViewTransform(1.05);
+		}
+
 
 	}
 
