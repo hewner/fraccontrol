@@ -16,10 +16,6 @@ public class FractalComponent extends JComponent {
 	public FractalComponent(FractalPainter p, ArtistState artist) {
 		this.artist = artist;
 		painter = p;
-		painter.addDesign("start", artist.getCurrentDesign());
-		painter.setStartRule("start");
-		Design design = new Design(Color.GREEN,DesignTemplateLibrary.library().getTemplate("square"));
-		painter.addDesign("sub", design);
 
 		ActionListener repaintListener  = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

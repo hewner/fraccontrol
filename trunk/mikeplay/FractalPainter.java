@@ -11,8 +11,6 @@ import java.util.Map;
 
 public class FractalPainter {
 	protected BufferedImage image;
-	protected Map<String, Design> designs;
-	protected String startDesign;
 	
 	protected int width, height;
 	protected ArtistState artist;
@@ -26,7 +24,6 @@ public class FractalPainter {
 	public FractalPainter(int width, int height, ArtistState artist)
 	{
 		this.artist = artist;
-		designs = new HashMap<String,Design>();
 		this.width = width;
 		this.height = height;
 	}
@@ -39,7 +36,6 @@ public class FractalPainter {
 		//System.out.println("width " + width + " height " + height);
 		if(width <= 0) throw new RenderingException("Width " + width);
 		if(height <= 0) throw new RenderingException("Height " + height);
-		if(startDesign == null) throw new RenderingException("No start rule!");
 		this.width = width;
 		this.height = height;
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -129,28 +125,12 @@ public class FractalPainter {
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHints(rh);
 		
-		thread = new PaintThread(getDesign(startDesign), g, this);
+		thread = new PaintThread(artist.getCurrentDesign(), g, this);
 		thread.start();
-	}
-	
-	public synchronized Design getDesign(String name) throws RenderingException {
-		if(!designs.containsKey(name)) {
-			throw new RenderingException("Reference to unknown design " + name);
-		}
-		return designs.get(name);
 	}
 	
 	public void drawCurrentImage(Graphics g) {
 			g.drawImage(image, 0,0,Color.BLACK, null);
-	}
-
-	public void addDesign(String name, Design design) {
-		designs.put(name, design);
-	}
-
-	public void setStartRule(String name) {
-		startDesign = name;
-		
 	}
 
 	public static final int maxRules = 10000;
