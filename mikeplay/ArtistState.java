@@ -90,7 +90,7 @@ public class ArtistState {
 		if(viewTransform != null) {
 			viewTransform.scale(zoomFactor, zoomFactor);
 			notifyViewTransformChange();
-			//System.out.println("zomming"+zoomFactor);
+			System.out.println("zomming"+zoomFactor);
 		}
 	}
 	
@@ -178,69 +178,7 @@ public class ArtistState {
 		preview = dB;
 		
 	}
-//
-//	public void updatePreviewShapeGame(JXInputAxisEvent e, FractalComponent component) {
-//		
-//		//TODO right now we're making the assumption that the 
-//		//current selected design is also the outermost design
-//		try {
-//			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
-//			if(preview == null) {
-//				preview = new DesignBounds(localPoint, getCurrentTemplate());
-//				return;
-//			}
-//			double dis = e.getAxis().getValue();
-//			double scale = (1+dis)/2;
-//			preview.setScale(scale);
-//			//System.out.println("scale="+scale); 			
-//			
-//		} catch (Exception e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//			preview = null;
-//		}
-//		
-//	}
-//	
-//	public void updatePreviewShapeGameButton(JXInputButtonEvent e, FractalComponent component) {
-//		//TODO right now we're making the assumption that the 
-//		//current selected design is also the outermost design
-//		try {
-//			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
-//			if(preview == null) {
-//				preview = new DesignBounds(localPoint, getCurrentTemplate());
-//				return;
-//			}
-//			
-//		} catch (Exception e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//			preview = null;
-//		}
-//		
-//	}
-//	
-//	
-//
-//	public void updatePreviewShapeGameRotate(JXInputAxisEvent ev, FractalComponent component) {
-//		//TODO right now we're making the assumption that the 
-//		//current selected design is also the outermost design
-//		try {
-//			Point2D localPoint = viewTransform().inverseTransform(getCrosshair(component),null);
-//			if(preview == null) {
-//				preview = new DesignBounds(localPoint, getCurrentTemplate());
-//				return;
-//			}
-//			
-//			preview.setRotation(3*ev.getAxis().getValue()); 			
-//			
-//		} catch (Exception e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//			preview = null;
-//		}
-//		
-//	}
+
 
 	public Design getCurrentDesign() {
 		return currentDesign;
