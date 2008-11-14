@@ -27,7 +27,9 @@ public class GameControl implements JXInputAxisEventListener,
 	protected ArtistState artist;
 	protected FractalComponent component;
 	protected Point2D cursor;
-	protected Timer timer;
+	protected Timer cursorTimer;
+	protected Timer zoomTimer;
+	protected Timer panTimer;
 
 	
 	public GameControl(ArtistState artist, FractalComponent component) {
@@ -89,16 +91,9 @@ public class GameControl implements JXInputAxisEventListener,
 		}
 		
 		if(ev.getAxis() == dev.getAxis(2)) {  //if z axis do zoom function
-			if(ev.getAxis().getValue()>0 && ev.getDelta()>0)
-				artist.zoomViewTransform(1+ev.getDelta()/5);
-			if(ev.getAxis().getValue()<0 && ev.getDelta()<0)
-				artist.zoomViewTransform(1+ev.getDelta()/5);
-			try {
-				component.painter().redrawAll();
-			} catch (FractalPainter.RenderingException e1) {
-				System.err.println("Rendering exception while zoomin");
-				e1.printStackTrace();
-			}
+			onZoom();
+				
+				
 		}
 		
 		if(ev.getAxis() == dev.getAxis(3)) {  //if x axis rotation do pan function
@@ -132,11 +127,32 @@ public class GameControl implements JXInputAxisEventListener,
 
 	
 
+	private void onZoom() {
+		
+		if(zoomTimer == null) {
+			zoomTimer = new Timer(100, new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					artist.zoomViewTransform(1+dev.getAxis(2).getValue()/10 );
+					try {
+						component.painter().redrawAll();
+					} catch (FractalPainter.RenderingException e1) {
+						System.err.println("Rendering exception while zooming");
+						e1.printStackTrace();
+					}
+				}
+			});
+		}	
+		if(Math.abs(dev.getAxis(2).getValue())>0.1 && !(zoomTimer.isRunning()))
+			zoomTimer.start();
+		
+		if(Math.abs(dev.getAxis(2).getValue())<0.1 && zoomTimer.isRunning()) 
+			zoomTimer.stop();
+		
+	}
+
 	public void changed(JXInputButtonEvent ev) {
 		System.out.println( "Button " + ev.getButton().getName() + " changed : state=" + ev.getButton().getState() );
-		
-		
-		
+	
 		if(ev.getButton() == dev.getButton(0)) {
 			if(ev.getButton().getState()) { //button down
 				onButtonADown();
@@ -149,11 +165,8 @@ public class GameControl implements JXInputAxisEventListener,
 	}
 
 	private void onButtonAUp() {
-//		double xPosition = dev.getAxis(0).getValue() +artist.getPreview().getCenter().getX();
-//		double yPosition = dev.getAxis(1).getValue() +artist.getPreview().getCenter().getY();
-//		
-//		Point2D localPoint = new Point2D.Double(xPosition, yPosition);
-		timer.stop();
+
+		cursorTimer.stop();
 		artist.updatePreview(getCrosshair(),cursor);
 		artist.getCurrentDesign().addSubdesign(artist.getPreview());
 		artist.setPreview(null);
@@ -169,15 +182,13 @@ public class GameControl implements JXInputAxisEventListener,
 
 	private void onButtonADown() {
 		artist.startPreview(artist.pointInFractalCoordinates(getCrosshair()));
-		timer = new Timer(100, new ActionListener() {
-
+		cursorTimer = new Timer(100, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				updateCursor();
 			}
-
 		});
 		cursor = new Point2D.Double(artist.getPreview().getCenter().getX(),artist.getPreview().getCenter().getY());
-		timer.start();
+		cursorTimer.start();
 	}
 	
 	private void updateCursor() {
