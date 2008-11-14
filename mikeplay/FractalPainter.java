@@ -36,7 +36,7 @@ public class FractalPainter {
 	}
 	
 	public void startDrawingWithSize(int width, int height) throws RenderingException {
-		System.out.println("width " + width + " height " + height);
+		//System.out.println("width " + width + " height " + height);
 		if(width <= 0) throw new RenderingException("Width " + width);
 		if(height <= 0) throw new RenderingException("Height " + height);
 		if(startDesign == null) throw new RenderingException("No start rule!");
@@ -88,7 +88,7 @@ public class FractalPainter {
 				}
 			}
 			if(!shouldStop) {
-				System.out.println("Finished drawing " + numberDrawn + " shapes.");
+				//System.out.println("Finished drawing " + numberDrawn + " shapes.");
 			}
 		}
 		

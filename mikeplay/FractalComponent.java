@@ -41,7 +41,7 @@ public class FractalComponent extends JComponent {
 		timer.start();
 	}
 	public void setBounds(int x, int y, int width, int height) {
-		System.out.println("W: " + width + " H: " + height );
+		//System.out.println("W: " + width + " H: " + height );
 		try {
 			if(width != getWidth() || height != getHeight()) {
 				painter.startDrawingWithSize(width, height);

@@ -19,6 +19,7 @@ public class ArtistState {
 	protected List<Runnable> onMenuChange;
 	protected List<Runnable> onViewTransformChange;
 	protected Design currentDesign;
+	protected Double zoomLevel;
 	//protected FractalComponent component;
 	
 	public ArtistState() {
@@ -31,6 +32,7 @@ public class ArtistState {
 		double unitLength = 500*.9;
 		viewTransform.scale(unitLength, unitLength);
 		viewTransform.translate(0.05, 0.05);
+		zoomLevel=1.0;
 	}
 	
 	public void onMenuChange(Runnable callback) {
@@ -88,10 +90,17 @@ public class ArtistState {
 	
 	public void zoomViewTransform(double zoomFactor) {
 		if(viewTransform != null) {
-			viewTransform.scale(zoomFactor, zoomFactor);
+			zoomLevel = zoomLevel*(1+zoomFactor/10);
+			//System.out.println("zoom=" +zoomLevel);
+			viewTransform.scale(1+zoomFactor/10,1+zoomFactor/10);
+			viewTransform.translate(-zoomFactor/(40*zoomLevel), -zoomFactor/(40*zoomLevel));
 			notifyViewTransformChange();
-			System.out.println("zomming"+zoomFactor);
+			//System.out.println("shift="+zoomFactor/(50*zoomLevel));
+			
 		}
+	}
+	public double getZoomLevel() {
+		return zoomLevel;
 	}
 	
 	public void panViewTransform(double xPan, double yPan) {
