@@ -29,7 +29,8 @@ public class GameControl implements JXInputAxisEventListener,
 	protected Point2D cursor;
 	protected Timer cursorTimer;
 	protected Timer zoomTimer;
-	protected Timer panTimer;
+	protected Timer panTimerX;
+	protected Timer panTimerY;
 
 	
 	public GameControl(ArtistState artist, FractalComponent component) {
@@ -90,49 +91,54 @@ public class GameControl implements JXInputAxisEventListener,
 			//positionPadChanged();
 		}
 		
-		if(ev.getAxis() == dev.getAxis(2)) {  //if z axis do zoom function
+		if(ev.getAxis() == dev.getAxis(2))   //if z axis do zoom function
 			onZoom();
-				
-				
-		}
 		
-		if(ev.getAxis() == dev.getAxis(3)) {  //if x axis rotation do pan function
-			if(ev.getAxis().getValue()>0 && ev.getDelta()>0)
-				artist.panViewTransform(ev.getDelta()/10, 0);
-			if(ev.getAxis().getValue()<0 && ev.getDelta()<0)
-				artist.panViewTransform(ev.getDelta()/10, 0);
-			try {
-				component.painter().redrawAll();
-			} catch (FractalPainter.RenderingException e1) {
-				System.err.println("Rendering exception while zoomin");
-				e1.printStackTrace();
-			}
-		}
+		if(ev.getAxis() == dev.getAxis(3))   //if x axis rotation do pan function
+			onPan();
 		
-		if(ev.getAxis() == dev.getAxis(4)) {  //if y axis rotation do pan function
-			if(ev.getAxis().getValue()>0 && ev.getDelta()>0)
-				artist.panViewTransform(0, ev.getDelta());
-			if(ev.getAxis().getValue()<0 && ev.getDelta()<0)
-				artist.panViewTransform(0, ev.getDelta());
-			try {
-				component.painter().redrawAll();
-			} catch (FractalPainter.RenderingException e1) {
-				System.err.println("Rendering exception while zoomin");
-				e1.printStackTrace();
-			}
-		}
+		if(ev.getAxis() == dev.getAxis(4))   //if y axis rotation do pan function
+			onPan();
+		
 		
 	}
 
-
-	
+	private void onPan() {
+		
+		ActionListener panTimerActionListener = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				artist.panViewTransform(dev.getAxis(3).getValue()/20,dev.getAxis(4).getValue()/20 );
+				try {
+					component.painter().redrawAll();
+				} catch (FractalPainter.RenderingException e1) {
+					System.err.println("Rendering exception while zooming");
+					e1.printStackTrace();
+				}
+			}
+			
+		};
+		if(panTimerX == null) 
+			panTimerX = new Timer(100, panTimerActionListener);
+		if(panTimerY == null) 
+			panTimerY = new Timer(100, panTimerActionListener);	
+		
+		if(Math.abs(dev.getAxis(3).getValue())>0.2 && !(panTimerX.isRunning()))
+			panTimerX.start();
+		if(Math.abs(dev.getAxis(3).getValue())<0.2 && panTimerX.isRunning()) 
+			panTimerX.stop();
+		if(Math.abs(dev.getAxis(4).getValue())>0.2 && !(panTimerY.isRunning()))
+			panTimerY.start();
+		if(Math.abs(dev.getAxis(4).getValue())<0.2 && panTimerY.isRunning()) 
+			panTimerY.stop();
+		
+	}
 
 	private void onZoom() {
 		
 		if(zoomTimer == null) {
 			zoomTimer = new Timer(100, new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					artist.zoomViewTransform(1+dev.getAxis(2).getValue()/10 );
+					artist.zoomViewTransform(dev.getAxis(2).getValue() );
 					try {
 						component.painter().redrawAll();
 					} catch (FractalPainter.RenderingException e1) {
@@ -144,10 +150,8 @@ public class GameControl implements JXInputAxisEventListener,
 		}	
 		if(Math.abs(dev.getAxis(2).getValue())>0.1 && !(zoomTimer.isRunning()))
 			zoomTimer.start();
-		
 		if(Math.abs(dev.getAxis(2).getValue())<0.1 && zoomTimer.isRunning()) 
 			zoomTimer.stop();
-		
 	}
 
 	public void changed(JXInputButtonEvent ev) {
