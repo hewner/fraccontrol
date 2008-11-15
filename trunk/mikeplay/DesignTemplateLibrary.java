@@ -23,9 +23,13 @@ public class DesignTemplateLibrary {
 	}
 	
 	public Design getRandomDesign(DesignTemplate template) {
-		Vector<Design> designs = map.get(template);
+		Vector<Design> designs = getDesignsForTemplate(template);
 		int num = random.nextInt(designs.size());
 		return designs.get(num);
+	}
+	
+	public Vector<Design> getDesignsForTemplate(DesignTemplate template) {
+		return map.get(template);
 	}
 	
 	public DesignTemplate getTemplate(String name) {
