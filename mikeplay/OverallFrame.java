@@ -15,7 +15,7 @@ public class OverallFrame extends JFrame {
 		super("FracControl");
 		
 		setSize(600,500);
-		ArtistState artist = new ArtistState();
+		final ArtistState artist = new ArtistState();
 		try {
 			
 			FractalPainter painter = new FractalPainter(600,500,artist);
@@ -42,7 +42,15 @@ public class OverallFrame extends JFrame {
 		final RuleMenu ruleMenu = new RuleMenu(artist);
 		getLayeredPane().setLayer(ruleMenu, JLayeredPane.PALETTE_LAYER);
 		getLayeredPane().add(ruleMenu);
-		ruleMenu.setSize(200,getHeight());
+		ruleMenu.setSize(300,getHeight());
+		
+		artist.onMenuChange( new Runnable() {
+			public void run() {
+				if(ruleMenu.isHidden() != artist.isRuleMenuHidden())
+					ruleMenu.toggleMenu();
+				repaint();
+			}
+		});
 		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent arg0) {
@@ -50,7 +58,7 @@ public class OverallFrame extends JFrame {
 				System.exit(0);
 			}
 		});
-}
+	}
 
 	protected void initLibrary() {
 		DesignTemplate squareTemplate = new DesignTemplate("square",new Rectangle2D.Double(0,0,1.0,1.0));

@@ -51,8 +51,7 @@ public class ArtistState {
 	public void notifyViewTransformChange() {
 		for(Runnable callback : onViewTransformChange) {
 			callback.run();
-		}
-		
+		}		
 	}
 	
 	public void setCurrentDesign(Design d) {
