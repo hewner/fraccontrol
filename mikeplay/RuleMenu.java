@@ -104,8 +104,11 @@ public class RuleMenu extends JComponent {
 	
 	public void paintComponent(Graphics g) {
 		
-		g.setColor(new Color((float).4,(float).4, (float) .4, (float) 1));
-		g.fillRect(0, 0, BOX_WIDTH*3+4*SPACING,getHeight());		
+		g.setColor(new Color((float).4,(float).4, (float) .4, (float) .9));
+		g.fillRect(0, 0, BOX_WIDTH*3+4*SPACING,getHeight());
+		g.setColor(new Color((float).4,(float).4, (float) .9, (float) 1));
+		g.fillRect(SPACING/2+artist.getMenuColumn()*(SPACING+BOX_WIDTH), 0, BOX_WIDTH+SPACING,getHeight());
+		
 		for(int column = 0; column < 3; column++) {
 			int selection = getSelection(column);
 			g.setColor(new Color((float).8,(float).8, (float) .8, (float) .5));

@@ -20,6 +20,7 @@ public class ArtistState {
 	protected List<Runnable> onViewTransformChange;
 	protected Design currentDesign;
 	protected Double zoomLevel;
+	protected int menuColumn = 0;
 	//protected FractalComponent component;
 	
 	public ArtistState() {
@@ -33,6 +34,85 @@ public class ArtistState {
 		viewTransform.scale(unitLength, unitLength);
 		viewTransform.translate(0.05, 0.05);
 		zoomLevel=1.0;
+	}
+	
+	public int getMenuColumn() {
+		return menuColumn;
+	}
+
+	public void makeNewDesign() {
+		Design newD = new Design(Color.GREEN,currentDesign.getTemplate());
+		currentDesign = newD;
+		notifyViewTransformChange();
+		notifyMenuChange();
+	}
+	
+	public void decrementCurrentDesignCategory() {
+		DesignTemplate previous = null;
+		for(DesignTemplate template : DesignTemplateLibrary.library().getTemplates()) {
+			if(template == currentDesign.getTemplate()) {
+				if(previous != null) {
+					currentDesign = DesignTemplateLibrary.library().getDesignsForTemplate(previous).firstElement();
+					notifyViewTransformChange();
+					notifyMenuChange();
+				}
+				return;
+			}
+			previous = template;
+		}
+	}
+
+	public void decrementCurrentDesign() {
+		Design previous = null;
+		for(Design design : DesignTemplateLibrary.library().getDesignsForTemplate(currentDesign.getTemplate())) {
+			if(design == currentDesign) {
+				if(previous != null) {
+					currentDesign = previous;
+					notifyViewTransformChange();
+					notifyMenuChange();
+				}
+				return;
+			}
+			previous = design;
+		}		
+	}
+	
+	public void incrementCurrentDesign() {
+		boolean found = false;
+		for(Design design : DesignTemplateLibrary.library().getDesignsForTemplate(currentDesign.getTemplate())) {
+			if(found) {
+				currentDesign = design;
+				notifyViewTransformChange();
+				notifyMenuChange();
+				return;
+			}
+			if(design == currentDesign) {
+				found = true;
+			}
+		}
+	}
+
+	
+	public void incrementCurrentDesignCategory() {
+		boolean found = false;
+		for(DesignTemplate template : DesignTemplateLibrary.library().getTemplates()) {
+			if(found) {
+				currentDesign = DesignTemplateLibrary.library().getDesignsForTemplate(template).firstElement();
+				notifyViewTransformChange();
+				notifyMenuChange();
+				return;
+			}
+			if(template == currentDesign.getTemplate()) {
+				found = true;
+			}
+		}
+	}
+	
+	public void setMenuColumn(int column) {
+		if(column >= 0 && column < 3) {
+			menuColumn = column;
+			notifyMenuChange();
+		}
 	}
 	
 	public void onMenuChange(Runnable callback) {
