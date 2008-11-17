@@ -89,7 +89,7 @@ public class FractalPainter {
 					newG.setTransform(newT);
 					newG.getTransform().preConcatenate(sub.transform());
 						
-					Design subDesign = DesignTemplateLibrary.library().getRandomDesign(sub.getTemplate());
+					Design subDesign = artist.library().getRandomDesign(sub.getTemplate());
 					double newScale = sub.getScale()*current.absoluteScale;
 					if(newScale >= minScale)
 						addTask(subDesign, newG, newScale);

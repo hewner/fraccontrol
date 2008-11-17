@@ -111,14 +111,17 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		if(e.getKeyChar() == 'c') {
 			artist.zoomViewTransform(-0.5);
 		}
-		if(e.getKeyChar() == 'm') {
-			artist.setCurrentDesign(DesignTemplateLibrary.library().getRandomDesign(DesignTemplateLibrary.library().getTemplate("circle")));
-		}
 		if(e.getKeyChar() == 'p') {
 			artist.setMenuColumn(artist.getMenuColumn() + 1);
 		}
 		if(e.getKeyChar() == 'o') {
 			artist.setMenuColumn(artist.getMenuColumn() - 1);
+		}
+		if(e.getKeyChar() == 'u') {
+			artist.writeToFile();
+		}
+		if(e.getKeyChar() == 'y') {
+			artist.readFromFile();
 		}
 
 	}

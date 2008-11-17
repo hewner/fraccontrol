@@ -48,7 +48,7 @@ public class RuleMenu extends JComponent {
 	
 	public int getSelection(int col) {
 		if(col == 0) {
-			LinkedList<DesignTemplate> list = DesignTemplateLibrary.library().getTemplates();
+			LinkedList<DesignTemplate> list = artist.library().getTemplates();
 			int i = 0;
 			for(DesignTemplate template : list ) {
 				if(artist.getCurrentDesign().getTemplate() == template)
@@ -71,7 +71,7 @@ public class RuleMenu extends JComponent {
 	}
 
 	private Vector<Design> getDesigns() {
-		return DesignTemplateLibrary.library().getDesignsForTemplate(artist.currentDesign.getTemplate());
+		return artist.library().getDesignsForTemplate(artist.currentDesign.getTemplate());
 	}	
 
 	public static final int SPACING = 10;

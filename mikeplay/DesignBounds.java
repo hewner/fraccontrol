@@ -1,13 +1,11 @@
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.*;
+import java.awt.geom.*;
+import java.io.Serializable;
 
 
-public class DesignBounds {
+public class DesignBounds implements Serializable {
+
+	private static final long serialVersionUID = -8416997179686702686L;
 	protected AffineTransform trans;
 	protected double scale, rotation;
 	protected Point2D center;

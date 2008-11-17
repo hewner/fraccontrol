@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.io.*;
 import java.util.*;
 
 import de.hardcode.jxinput.event.JXInputAxisEvent;
@@ -21,10 +22,10 @@ public class ArtistState {
 	protected Design currentDesign;
 	protected Double zoomLevel;
 	protected int menuColumn = 0;
+	protected DesignTemplateLibrary library;
 	
 	
 	public ArtistState() {
-		
 		templateNum = 0;
 		rulemenuHidden = false;
 		onMenuChange = new LinkedList<Runnable>();
@@ -34,6 +35,11 @@ public class ArtistState {
 		viewTransform.scale(unitLength, unitLength);
 		viewTransform.translate(0.05, 0.05);
 		zoomLevel=1.0;
+		library = new DesignTemplateLibrary();
+	}
+	
+	public DesignTemplateLibrary library() {
+		return library;
 	}
 	
 	public int getMenuColumn() {
@@ -49,10 +55,10 @@ public class ArtistState {
 	
 	public void decrementCurrentDesignCategory() {
 		DesignTemplate previous = null;
-		for(DesignTemplate template : DesignTemplateLibrary.library().getTemplates()) {
+		for(DesignTemplate template : library().getTemplates()) {
 			if(template == currentDesign.getTemplate()) {
 				if(previous != null) {
-					currentDesign = DesignTemplateLibrary.library().getDesignsForTemplate(previous).firstElement();
+					currentDesign = library().getDesignsForTemplate(previous).firstElement();
 					notifyViewTransformChange();
 					notifyMenuChange();
 				}
@@ -64,7 +70,7 @@ public class ArtistState {
 
 	public void decrementCurrentDesign() {
 		Design previous = null;
-		for(Design design : DesignTemplateLibrary.library().getDesignsForTemplate(currentDesign.getTemplate())) {
+		for(Design design : library().getDesignsForTemplate(currentDesign.getTemplate())) {
 			if(design == currentDesign) {
 				if(previous != null) {
 					currentDesign = previous;
@@ -79,7 +85,7 @@ public class ArtistState {
 	
 	public void incrementCurrentDesign() {
 		boolean found = false;
-		for(Design design : DesignTemplateLibrary.library().getDesignsForTemplate(currentDesign.getTemplate())) {
+		for(Design design : library().getDesignsForTemplate(currentDesign.getTemplate())) {
 			if(found) {
 				currentDesign = design;
 				notifyViewTransformChange();
@@ -95,9 +101,9 @@ public class ArtistState {
 	
 	public void incrementCurrentDesignCategory() {
 		boolean found = false;
-		for(DesignTemplate template : DesignTemplateLibrary.library().getTemplates()) {
+		for(DesignTemplate template : library().getTemplates()) {
 			if(found) {
-				currentDesign = DesignTemplateLibrary.library().getDesignsForTemplate(template).firstElement();
+				currentDesign = library().getDesignsForTemplate(template).firstElement();
 				notifyViewTransformChange();
 				notifyMenuChange();
 				return;
@@ -202,15 +208,15 @@ public class ArtistState {
 	}
 	
 	public DesignTemplate getCurrentTemplate() {
-		return DesignTemplateLibrary.library().getTemplates().get(getCurrentTemplateNum());
+		return library().getTemplates().get(getCurrentTemplateNum());
 	}
 	
 	public int getTemplateCount() {
-		return DesignTemplateLibrary.library().getTemplates().size();
+		return library().getTemplates().size();
 	}
 	
 	public List<DesignTemplate> getTemplates() {
-		return DesignTemplateLibrary.library().getTemplates();
+		return library().getTemplates();
 	}
 	
 	public DesignBounds getPreview() {
@@ -272,6 +278,51 @@ public class ArtistState {
 
 	public Design getCurrentDesign() {
 		return currentDesign;
+	}
+	
+	public void writeToFile() {
+		
+		StateToSave toSave = new StateToSave();
+		toSave.library = library();
+		toSave.zoomLevel = zoomLevel;
+		toSave.viewTransform = viewTransform;
+		toSave.currentDesign = currentDesign;
+		
+		FileOutputStream fos = null;
+		ObjectOutputStream out = null;
+		
+		try {
+			fos = new FileOutputStream("test.dat");
+			out = new ObjectOutputStream(fos);
+			out.writeObject(toSave);
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void readFromFile() {
+		FileInputStream fos = null;
+		ObjectInputStream out = null;
+		StateToSave save;
+		try {
+			fos = new FileInputStream("test.dat");
+			out = new ObjectInputStream(fos);
+			save = (StateToSave) out.readObject();
+			out.close();
+			library = save.library;
+			zoomLevel = save.zoomLevel;
+			viewTransform = save.viewTransform;
+			currentDesign = save.currentDesign;
+			templateNum = 0;
+			notifyMenuChange();
+			notifyViewTransformChange();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 }

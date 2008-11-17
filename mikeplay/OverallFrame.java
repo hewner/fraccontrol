@@ -19,10 +19,10 @@ public class OverallFrame extends JFrame {
 		try {
 			
 			FractalPainter painter = new FractalPainter(600,500,artist);
-			initLibrary();
-			Design design = new Design(Color.BLUE,DesignTemplateLibrary.library().getTemplate("square"));
-			new Design(Color.RED,DesignTemplateLibrary.library().getTemplate("circle"));
-			new Design(Color.YELLOW,DesignTemplateLibrary.library().getTemplate("triangle"));
+			initLibrary(artist);
+			Design design = new Design(Color.BLUE,artist.library().getTemplate("square"));
+			new Design(Color.RED,artist.library().getTemplate("circle"));
+			new Design(Color.YELLOW,artist.library().getTemplate("triangle"));
 			artist.setCurrentDesign(design);
 			FractalComponent fractalComponent = new FractalComponent(painter,artist); 	
 			getContentPane().add(fractalComponent);
@@ -60,17 +60,14 @@ public class OverallFrame extends JFrame {
 		});
 	}
 
-	protected void initLibrary() {
-		DesignTemplate squareTemplate = new DesignTemplate("square",new Rectangle2D.Double(0,0,1.0,1.0));
-		DesignTemplate circleTemplate = new DesignTemplate("circle", new Ellipse2D.Double(0,0,1.0,1.0));
-		DesignTemplateLibrary.library().addTemplate(squareTemplate);
-		DesignTemplateLibrary.library().addTemplate(circleTemplate);
-		Polygon2D triagle = new Polygon2D();
+	protected void initLibrary(ArtistState artist) {
+		DesignTemplate squareTemplate = new DesignTemplate("square",new Rectangle2D.Double(0,0,1.0,1.0), artist.library());
+		DesignTemplate circleTemplate = new DesignTemplate("circle", new Ellipse2D.Double(0,0,1.0,1.0), artist.library());
+			Polygon2D triagle = new Polygon2D();
 		triagle.addPoint(0, 0);
 		triagle.addPoint(1, 0);
 		triagle.addPoint((float).5, (float).866);
-		DesignTemplate triangleTemplate = new DesignTemplate("triangle", triagle);
-		DesignTemplateLibrary.library().addTemplate(triangleTemplate);
+		DesignTemplate triangleTemplate = new DesignTemplate("triangle", triagle, artist.library());
 		
 	}
 
