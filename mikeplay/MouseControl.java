@@ -108,6 +108,9 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		if(e.getKeyChar() == 'x') {
 			artist.zoomViewTransform(1.05);
 		}
+		if(e.getKeyChar() == 'c') {
+			artist.zoomViewTransform(-0.5);
+		}
 		if(e.getKeyChar() == 'm') {
 			artist.setCurrentDesign(DesignTemplateLibrary.library().getRandomDesign(DesignTemplateLibrary.library().getTemplate("circle")));
 		}
