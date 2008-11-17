@@ -1,7 +1,9 @@
 import java.awt.Graphics2D;
+import java.io.Serializable;
 
+public class DesignInstance implements Serializable {
 
-public class DesignInstance {
+	private static final long serialVersionUID = -6912448217614364296L;
 	protected Design baseDesign;
 	public DesignInstance(Design design) {
 		baseDesign = design;

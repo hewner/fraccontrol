@@ -1,19 +1,18 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
 
-public class Design {
+public class Design implements Serializable {
 	
+	private static final long serialVersionUID = -1428638605128121687L;
 	protected Color background;
 	protected List<DesignBounds> subDesigns;
-	protected Area subDesignArea;
+	protected transient Area subDesignArea;
 	protected DesignTemplate template;
 	
 	public Design(Color background, DesignTemplate t) {
@@ -21,7 +20,7 @@ public class Design {
 		subDesigns = new LinkedList<DesignBounds>();
 		subDesignArea = new Area();
 		template = t;
-		DesignTemplateLibrary.library().addDesign(this);
+		t.getLibrary().addDesign(this);
 	}
 	
 	public List<DesignBounds> getSubdesigns() {
@@ -44,13 +43,23 @@ public class Design {
 		subDesigns.add(shape);
 	}
 	
+	protected Area subDesignArea() {
+		if(subDesignArea == null) {
+			subDesignArea = new Area();
+			for(DesignBounds sub : subDesigns) {
+				subDesignArea.add(sub.computeArea());
+			}
+		}
+		return subDesignArea;
+	}
+	
 	public boolean fits(DesignBounds shape) {
 		Area overall = new Area(new Rectangle2D.Double(0,0,1.0,1.0));
 		Area area = shape.computeArea();
 		area.subtract(overall);
 		if(!area.isEmpty()) return false;
 		area = shape.computeArea();
-		area.intersect(subDesignArea);
+		area.intersect(subDesignArea());
 		if(!area.isEmpty()) return false;
 		return true;
 	}

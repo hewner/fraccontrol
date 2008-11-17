@@ -1,8 +1,10 @@
+import java.io.Serializable;
 import java.util.*;
 
 
-public class DesignTemplateLibrary {
+public class DesignTemplateLibrary implements Serializable {
 	
+	private static final long serialVersionUID = -7673206905863074000L;
 	protected Map<DesignTemplate,Vector<Design>> map;
 	protected LinkedList<DesignTemplate> templates;
 	protected Random random;
@@ -45,13 +47,4 @@ public class DesignTemplateLibrary {
 		return templates;
 	}
 	
-	static DesignTemplateLibrary singleton = null;
-	public static DesignTemplateLibrary library() {
-		
-		if(singleton == null) {
-			singleton = new DesignTemplateLibrary();
-		}
-		
-		return singleton;		
-	}
 }
