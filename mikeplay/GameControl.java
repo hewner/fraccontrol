@@ -36,7 +36,54 @@ public class GameControl implements JXInputAxisEventListener,
 	public GameControl(ArtistState artist, FractalComponent component) {
 		this.component = component;
 		this.artist = artist;
+		initTimers();
 		initGamepad();
+	}
+
+	private void initTimers() {
+		cursorTimer = new Timer(100, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateCursor();
+				System.out.println(dev.getAxis(0).getValue());
+			}
+		});
+		
+		zoomTimer = new Timer(100, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(Math.abs(dev.getAxis(2).getValue())<0.2 && zoomTimer.isRunning()) 
+					zoomTimer.stop();
+				artist.zoomViewTransform(1+dev.getAxis(2).getValue()/10 );
+				try {
+					component.painter().redrawAll();
+				} catch (FractalPainter.RenderingException e1) {
+					System.err.println("Rendering exception while zooming");
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		ActionListener panTimerActionListener = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				if(Math.abs(dev.getAxis(3).getValue())<0.2 && panTimerX.isRunning()) 
+					panTimerX.stop();
+				if(Math.abs(dev.getAxis(4).getValue())<0.2 && panTimerY.isRunning()) 
+					panTimerY.stop();
+				artist.panViewTransform(dev.getAxis(3).getValue()/20,dev.getAxis(4).getValue()/20 );
+				try {
+					component.painter().redrawAll();
+				} catch (FractalPainter.RenderingException e1) {
+					System.err.println("Rendering exception while zooming");
+					e1.printStackTrace();
+				}
+			}
+			
+		};
+		 
+		panTimerX = new Timer(100, panTimerActionListener);
+		
+		panTimerY = new Timer(100, panTimerActionListener);
+		
 	}
 
 	public void initGamepad() {
@@ -105,22 +152,7 @@ public class GameControl implements JXInputAxisEventListener,
 
 	private void onPan() {
 		
-		ActionListener panTimerActionListener = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				artist.panViewTransform(dev.getAxis(3).getValue()/20,dev.getAxis(4).getValue()/20 );
-				try {
-					component.painter().redrawAll();
-				} catch (FractalPainter.RenderingException e1) {
-					System.err.println("Rendering exception while zooming");
-					e1.printStackTrace();
-				}
-			}
 			
-		};
-		if(panTimerX == null) 
-			panTimerX = new Timer(100, panTimerActionListener);
-		if(panTimerY == null) 
-			panTimerY = new Timer(100, panTimerActionListener);	
 		
 		if(Math.abs(dev.getAxis(3).getValue())>0.2 && !(panTimerX.isRunning()))
 			panTimerX.start();
@@ -135,64 +167,47 @@ public class GameControl implements JXInputAxisEventListener,
 
 	private void onZoom() {
 		
-		if(zoomTimer == null) {
-			zoomTimer = new Timer(100, new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					artist.zoomViewTransform(dev.getAxis(2).getValue() );
-					try {
-						component.painter().redrawAll();
-					} catch (FractalPainter.RenderingException e1) {
-						System.err.println("Rendering exception while zooming");
-						e1.printStackTrace();
-					}
-				}
-			});
-		}	
-		if(Math.abs(dev.getAxis(2).getValue())>0.1 && !(zoomTimer.isRunning()))
+		
+		if(Math.abs(dev.getAxis(2).getValue())>0.2 && !(zoomTimer.isRunning()))
 			zoomTimer.start();
-		if(Math.abs(dev.getAxis(2).getValue())<0.1 && zoomTimer.isRunning()) 
+		if(Math.abs(dev.getAxis(2).getValue())<0.2 && zoomTimer.isRunning()) 
 			zoomTimer.stop();
 	}
 
 	public void changed(JXInputButtonEvent ev) {
 		System.out.println( "Button " + ev.getButton().getName() + " changed : state=" + ev.getButton().getState() );
 	
-		if(ev.getButton() == dev.getButton(0)) {
-			if(ev.getButton().getState()) { //button down
-				onButtonADown();
-				
-			} else { //button up
-				onButtonAUp();
-			}
+		if(ev.getButton() == dev.getButton(0) && dev.getButton(0).getState()) {
+			onButtonAClicked();
 		}
 		
 	}
 
 	private void onButtonAUp() {
 
-		cursorTimer.stop();
-		artist.updatePreview(getCrosshair(),cursor);
-		artist.getCurrentDesign().addSubdesign(artist.getPreview());
-		artist.setPreview(null);
-		try {
-			component.painter().redrawAll();
-		} catch (FractalPainter.RenderingException e1) {
-			System.err.println("Rendering exception adding new subcomponent");
-			e1.printStackTrace();
-		}
+		
 		
 		
 	}
 
-	private void onButtonADown() {
-		artist.startPreview(artist.pointInFractalCoordinates(getCrosshair()));
-		cursorTimer = new Timer(100, new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				updateCursor();
+	private void onButtonAClicked() {
+		if(cursorTimer.isRunning()) {
+			cursorTimer.stop();
+			artist.updatePreview(getCrosshair(),cursor);
+			artist.getCurrentDesign().addSubdesign(artist.getPreview());
+			artist.setPreview(null);
+			try {
+				component.painter().redrawAll();
+			} catch (FractalPainter.RenderingException e1) {
+				System.err.println("Rendering exception adding new subcomponent");
+				e1.printStackTrace();
 			}
-		});
-		cursor = new Point2D.Double(artist.getPreview().getCenter().getX(),artist.getPreview().getCenter().getY());
-		cursorTimer.start();
+		} else {
+		
+			artist.startPreview(artist.pointInFractalCoordinates(getCrosshair()));
+			cursor = new Point2D.Double(artist.getPreview().getCenter().getX(),artist.getPreview().getCenter().getY());
+			cursorTimer.start();
+		}
 	}
 	
 	private void updateCursor() {
