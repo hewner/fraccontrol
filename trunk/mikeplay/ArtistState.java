@@ -23,8 +23,8 @@ public class ArtistState {
 	protected Double zoomLevel;
 	protected int menuColumn = 0;
 	protected DesignTemplateLibrary library;
+	protected int componentHeight, componentWidth;
 	
-	    
 	public ArtistState() {
 		templateNum = 0;
 		rulemenuHidden = false;
@@ -176,11 +176,14 @@ public class ArtistState {
 	
 	public void zoomViewTransform(double zoomFactor) {
 		if(viewTransform != null) {
-			zoomLevel = zoomLevel*(1+zoomFactor/10);
+			zoomLevel = zoomLevel*(zoomFactor);
 			//System.out.println("zoomlevel=" +zoomLevel);
-			viewTransform.translate(0.6,0.5);
-			viewTransform.scale(1+zoomFactor/10,1+zoomFactor/10);
-			viewTransform.translate(-0.6,-0.5);
+			Point2D crosshair = new Point2D.Double(componentWidth/2,componentHeight/2);
+			Point2D crosshairFractalCoordinates = pointInFractalCoordinates(crosshair);
+			
+			viewTransform.translate(crosshairFractalCoordinates.getX(),crosshairFractalCoordinates.getY());
+			viewTransform.scale(zoomFactor,zoomFactor);
+			viewTransform.translate(-crosshairFractalCoordinates.getX(),-crosshairFractalCoordinates.getY());
 			notifyViewTransformChange();
 			//System.out.println("shift="+zoomFactor/(50*zoomLevel));
 			
@@ -321,6 +324,17 @@ public class ArtistState {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		
+	}
+
+	public void zoomOriginal() {
+		zoomViewTransform(1/zoomLevel);
+		
+	}
+
+	public void setSize(int width, int height) {
+		this.componentWidth = width;
+		this.componentHeight = height;
 		
 	}
 	
