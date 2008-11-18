@@ -42,6 +42,11 @@ public class Design implements Serializable {
 		subDesignArea.add(shape.computeArea());
 		subDesigns.add(shape);
 	}
+
+	public void removeSubdesign(DesignBounds shape) {
+		subDesigns.remove(shape);
+		subDesignArea.subtract(shape.computeArea());
+	}
 	
 	protected Area subDesignArea() {
 		if(subDesignArea == null) {
@@ -62,6 +67,15 @@ public class Design implements Serializable {
 		area.intersect(subDesignArea());
 		if(!area.isEmpty()) return false;
 		return true;
+	}
+	
+	public DesignBounds subDesignUnder(Point2D point) {
+		for(DesignBounds sub : subDesigns) {
+			if(sub.computeArea().contains(point)) {
+				return sub;
+			}
+		}
+		return null;
 	}
 	
 	public void setRightScale(DesignBounds shape) {
