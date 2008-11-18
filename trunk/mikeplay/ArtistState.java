@@ -230,11 +230,10 @@ public class ArtistState {
 		
 		preview.setScale(scale);
 		preview.setRotation(Math.atan2(preview.getCenter().getY()-localPoint.getY(), preview.getCenter().getX()-localPoint.getX()));
-		System.out.println(preview.getCenter());
 	}
 	
 	public void updatePreview(Point2D center, Point2D radius) {
-		System.out.println(center + "  " + radius);
+		preview.setCenter(center);
 		updatePreviewForRadius(radius);
 		ensurePreviewDoesNotOverlap();
 	}

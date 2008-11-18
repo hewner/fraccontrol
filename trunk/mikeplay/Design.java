@@ -54,7 +54,7 @@ public class Design implements Serializable {
 	}
 	
 	public boolean fits(DesignBounds shape) {
-		Area overall = new Area(new Rectangle2D.Double(0,0,1.0,1.0));
+		Area overall = new Area(template.getShape());
 		Area area = shape.computeArea();
 		area.subtract(overall);
 		if(!area.isEmpty()) return false;
@@ -71,7 +71,7 @@ public class Design implements Serializable {
 		}
 		double smallestFailure = shape.getScale();
 		double largestSuccess = 0;
-		for(int i = 0; i < 10; i++) {
+		for(int i = 0; i < 20; i++) {
 			double newScale = (smallestFailure + largestSuccess)/2;
 			shape.setScale(newScale);
 			if(fits(shape)) {

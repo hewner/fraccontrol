@@ -27,12 +27,31 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 
 	public void mouseExited(MouseEvent e) { }
 
-	
+	public Point2D moveStart;
 	public void mouseDragged(MouseEvent e) {
 		FractalComponent component = (FractalComponent) e.getSource();
 		Point2D localPoint = artist.pointInFractalCoordinates(e.getPoint());
-		artist.updatePreview(artist.getPreview().getCenter(),  localPoint);
-		artist.ensurePreviewDoesNotOverlap();
+		if(e.isShiftDown()) {
+			if(moveStart == null) {
+				moveStart = localPoint;
+			} else {
+				double deltaX = localPoint.getX() - moveStart.getX();
+				double deltaY = localPoint.getY() - moveStart.getY();
+				Point2D newCenter = new Point2D.Double(
+						artist.getPreview().getCenter().getX() + deltaX,
+						artist.getPreview().getCenter().getY() + deltaY);
+				moveStart = localPoint;
+				if(newCenter.getX() > 1 || newCenter.getX() < 0 || newCenter.getY() > 1 || newCenter.getY() < 0) {
+					return;
+				}
+				
+				artist.updatePreview(newCenter,  localPoint);
+				System.out.println("Center " + newCenter);
+			}
+		} else {
+			moveStart = null;
+			artist.updatePreview(artist.getPreview().getCenter(),  localPoint);
+		}
 		component.repaint();
 	}
 
