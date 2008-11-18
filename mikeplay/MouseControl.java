@@ -21,7 +21,23 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		this.artist = artist;
 	}
 	
-	public void mouseClicked(MouseEvent e) { }
+	public void mouseClicked(MouseEvent e) {
+		FractalComponent component = (FractalComponent) e.getSource();
+		Point2D localPoint = localPoint(e);
+		DesignBounds subDesign = artist.getCurrentDesign().subDesignUnder(localPoint);
+		if(subDesign != null) {
+			if(e.getClickCount() == 2) {
+				artist.getCurrentDesign().removeSubdesign(subDesign);
+				artist.notifyViewTransformChange();
+			}
+		} else {
+			//click on unfilled area
+		}
+	}
+
+	private Point2D localPoint(MouseEvent e) {
+		return artist.pointInFractalCoordinates(e.getPoint());
+	}
 
 	public void mouseEntered(MouseEvent e) { }
 
@@ -30,7 +46,7 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 	public Point2D moveStart;
 	public void mouseDragged(MouseEvent e) {
 		FractalComponent component = (FractalComponent) e.getSource();
-		Point2D localPoint = artist.pointInFractalCoordinates(e.getPoint());
+		Point2D localPoint = localPoint(e);
 		if(e.isShiftDown()) {
 			if(moveStart == null) {
 				moveStart = localPoint;
@@ -59,7 +75,7 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 
 	public void mouseReleased(MouseEvent e) {
 		FractalComponent component = (FractalComponent) e.getSource();
-		Point2D localPoint = artist.pointInFractalCoordinates(e.getPoint());
+		Point2D localPoint = localPoint(e);
 		artist.updatePreview(artist.getPreview().getCenter(), localPoint);
 		artist.getCurrentDesign().addSubdesign(artist.getPreview());
 		artist.setPreview(null);
@@ -73,7 +89,7 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 	}
 
 	public void mousePressed(MouseEvent e) {
-		artist.startPreview(artist.pointInFractalCoordinates(e.getPoint()));
+		artist.startPreview(localPoint(e));
 	}
 
 	public void mouseMoved(MouseEvent e) { }
