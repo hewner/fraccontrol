@@ -24,7 +24,7 @@ public class ArtistState {
 	protected int menuColumn = 0;
 	protected DesignTemplateLibrary library;
 	
-	
+	    
 	public ArtistState() {
 		templateNum = 0;
 		rulemenuHidden = false;
