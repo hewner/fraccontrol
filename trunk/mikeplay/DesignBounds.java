@@ -84,4 +84,6 @@ public class DesignBounds implements Serializable {
 		return scale;
 	}
 
+	
+
 }

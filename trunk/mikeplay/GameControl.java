@@ -36,6 +36,7 @@ public class GameControl implements JXInputAxisEventListener,
 	public GameControl(ArtistState artist, FractalComponent component) {
 		this.component = component;
 		this.artist = artist;
+		this.cursor = new Point2D.Double(1,1);
 		initTimers();
 		initGamepad();
 	}
@@ -44,7 +45,7 @@ public class GameControl implements JXInputAxisEventListener,
 		cursorTimer = new Timer(100, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				updateCursor();
-				System.out.println(dev.getAxis(0).getValue());
+				
 			}
 		});
 		
@@ -69,13 +70,15 @@ public class GameControl implements JXInputAxisEventListener,
 					panTimerX.stop();
 				if(Math.abs(dev.getAxis(4).getValue())<0.2 && panTimerY.isRunning()) 
 					panTimerY.stop();
-				artist.panViewTransform(dev.getAxis(3).getValue()/20,dev.getAxis(4).getValue()/20 );
+				artist.panViewTransform(-dev.getAxis(3).getValue()/20,-dev.getAxis(4).getValue()/20 );
+				updateCursor();
 				try {
 					component.painter().redrawAll();
 				} catch (FractalPainter.RenderingException e1) {
 					System.err.println("Rendering exception while zooming");
 					e1.printStackTrace();
 				}
+				
 			}
 			
 		};
@@ -94,7 +97,7 @@ public class GameControl implements JXInputAxisEventListener,
 			for(int i=0; i<dev.getNumberOfAxes(); i++ ) {
 				Axis axis = dev.getAxis(i); //get axies
 				JXInputEventManager.addListener( this, axis, 0.1 );
-				System.out.println("AxisName"+i+" "+axis.getName());
+				//System.out.println("AxisName"+i+" "+axis.getName());
 			}
 			
 			for(int i=0; i<dev.getNumberOfButtons() ; i++ ) {
@@ -121,7 +124,7 @@ public class GameControl implements JXInputAxisEventListener,
 		double height = component.getHeight();
 					
 		Point2D center = new Point.Double(width/2, height/2);
-			return center;
+		return center;
 		//return artist.pointInFractalCoordinates(center);
 
 	}
@@ -180,45 +183,63 @@ public class GameControl implements JXInputAxisEventListener,
 		if(ev.getButton() == dev.getButton(0) && dev.getButton(0).getState()) {
 			onButtonAClicked();
 		}
+		if(ev.getButton() == dev.getButton(1) && dev.getButton(1).getState()) {
+			onButtonBClicked();
+		}
+		if(ev.getButton() == dev.getButton(5) && dev.getButton(5).getState()) {
+			onButtonRBClicked();
+		}
 		
 	}
 
-	private void onButtonAUp() {
-
-		
-		
-		
-	}
+	
 
 	private void onButtonAClicked() {
-		if(cursorTimer.isRunning()) {
+		if(cursorTimer.isRunning()) { //second time button a is pressed
 			cursorTimer.stop();
-			artist.updatePreview(getCrosshair(),cursor);
+			artist.updatePreview(artist.pointInFractalCoordinates(getCrosshair()),cursor);
 			artist.getCurrentDesign().addSubdesign(artist.getPreview());
 			artist.setPreview(null);
+			
 			try {
 				component.painter().redrawAll();
 			} catch (FractalPainter.RenderingException e1) {
 				System.err.println("Rendering exception adding new subcomponent");
 				e1.printStackTrace();
 			}
-		} else {
-		
+		} else { //first time button a is pressed
+			
 			artist.startPreview(artist.pointInFractalCoordinates(getCrosshair()));
-			cursor = new Point2D.Double(artist.getPreview().getCenter().getX(),artist.getPreview().getCenter().getY());
+			cursor.setLocation(artist.getPreview().getCenter());
+			System.out.println("center"+cursor);
 			cursorTimer.start();
 		}
 	}
-	
+	private void onButtonBClicked() {
+		DesignBounds subDesign = artist.getCurrentDesign().subDesignUnder(artist.pointInFractalCoordinates(getCrosshair()));
+		if(subDesign != null) {
+			System.out.println("delete"+getCrosshair());
+			artist.getCurrentDesign().removeSubdesign(subDesign);
+			artist.notifyViewTransformChange();
+		} else {
+			//click on unfilled area
+		}
+		
+		
+		
+	}
+	private void onButtonRBClicked() {
+		artist.zoomOriginal();
+	}
 	private void updateCursor() {
 
 		double xPosition = dev.getAxis(0).getValue();
 		double yPosition = dev.getAxis(1).getValue();
-		if(Math.abs(xPosition) < .2 && Math.abs(yPosition) < .2)
+		if(Math.abs(xPosition) < .2 || Math.abs(yPosition) < .2)
 			return;
 		cursor.setLocation(xPosition/50+cursor.getX(), yPosition/50+cursor.getY());
 		artist.updatePreview(getCrosshair(), cursor);
-		
+		System.out.println("cursor"+cursor);
 		component.repaint();
 		
 	}
