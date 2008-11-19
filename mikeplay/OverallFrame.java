@@ -61,13 +61,13 @@ public class OverallFrame extends JFrame {
 	}
 
 	protected void initLibrary(ArtistState artist) {
-		DesignTemplate squareTemplate = new DesignTemplate("square",new Rectangle2D.Double(0,0,1.0,1.0), artist.library());
-		DesignTemplate circleTemplate = new DesignTemplate("circle", new Ellipse2D.Double(0,0,1.0,1.0), artist.library());
-			Polygon2D triagle = new Polygon2D();
-		triagle.addPoint(0, 0);
-		triagle.addPoint(1, 0);
-		triagle.addPoint((float).5, (float).866);
-		DesignTemplate triangleTemplate = new DesignTemplate("triangle", triagle, artist.library());
+		DesignTemplate squareTemplate = new DesignTemplate("square",new Rectangle2D.Double(0,0,1.0,1.0), artist.library(),2/Math.sqrt(2));
+		DesignTemplate circleTemplate = new DesignTemplate("circle", new Ellipse2D.Double(0,0,1.0,1.0), artist.library(), 2);
+			Polygon2D triangle = new Polygon2D();
+		triangle.addPoint(0, (float).866);
+		triangle.addPoint(1, (float).866); //(1, 0);
+		triangle.addPoint((float) .5,0); //((float).5, (float).866);
+		DesignTemplate triangleTemplate = new DesignTemplate("triangle", triangle, artist.library(), Math.sqrt(3));
 		
 	}
 

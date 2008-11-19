@@ -47,6 +47,7 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 	public void mouseDragged(MouseEvent e) {
 		FractalComponent component = (FractalComponent) e.getSource();
 		Point2D localPoint = localPoint(e);
+		System.out.println("localPoint"+localPoint);
 		if(e.isShiftDown()) {
 			if(moveStart == null) {
 				moveStart = localPoint;
@@ -76,6 +77,7 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 	public void mouseReleased(MouseEvent e) {
 		FractalComponent component = (FractalComponent) e.getSource();
 		Point2D localPoint = localPoint(e);
+		
 		artist.updatePreview(artist.getPreview().getCenter(), localPoint);
 		artist.getCurrentDesign().addSubdesign(artist.getPreview());
 		artist.setPreview(null);
@@ -90,6 +92,7 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 
 	public void mousePressed(MouseEvent e) {
 		artist.startPreview(localPoint(e));
+		
 	}
 
 	public void mouseMoved(MouseEvent e) { }

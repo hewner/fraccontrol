@@ -229,7 +229,7 @@ public class ArtistState {
 	private void updatePreviewForRadius(Point2D localPoint) {
 		
 		double dis = preview.getCenter().distance(localPoint);
-		double scale = 2*dis/1.4142;
+		double scale =  preview.getTemplate().getShapeScaleFactor()*dis;    //2*dis/1.4142;
 		
 		preview.setScale(scale);
 		preview.setRotation(Math.atan2(preview.getCenter().getY()-localPoint.getY(), preview.getCenter().getX()-localPoint.getX()));
