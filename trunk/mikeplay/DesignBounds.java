@@ -33,6 +33,14 @@ public class DesignBounds implements Serializable {
 	public void draw(Graphics2D g) {
 		if(scale != 0) {
 			g.fill(template.getShape());
+			
+			g.scale(.1,.1);
+			g.setColor(Color.black);
+			g. drawLine((int) center.getX(), (int) center.getY(), (int) template.getShape().getBounds().getWidth() , (int) template.getShape().getBounds().getHeight());
+			g.scale(10,10);
+			
+			
+			
 		}
 	}
 	
