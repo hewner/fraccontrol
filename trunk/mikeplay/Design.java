@@ -3,6 +3,7 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.*;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class Design implements Serializable {
 	}
 	
 	public void drawBackground(Graphics2D g) {
-		g.setColor(background);
+		//g.setColor(background);
 		Shape rect = template.getShape(); 
 		if(!rect.intersects(g.getClipBounds())) {
 			//this shape is not on screen
@@ -56,6 +57,37 @@ public class Design implements Serializable {
 			}
 		}
 		return subDesignArea;
+	}
+	
+	public boolean isBig(DesignBounds sub) {
+		if(sub.getScale() > bigSmallCutoff()) {
+			return true;
+		}
+		return false;
+	}
+	
+	double bigSmallCutoff;
+	protected double bigSmallCutoff() {
+	    if(subDesigns.size() < 2) return -1;
+		if(bigSmallCutoff <= 0) {
+			Collections.sort(subDesigns);
+			double startRange = 0;
+			double bigDifference = 0;
+			double lastScale = 0;
+			for(DesignBounds sub : subDesigns) {
+				if(lastScale != 0) {
+					double curDiff = sub.getScale() - lastScale;
+					if(curDiff > bigDifference) {
+						bigDifference = curDiff;
+						startRange = lastScale;
+					}
+				}
+				lastScale = sub.getScale();
+			}
+			bigSmallCutoff = startRange + bigDifference/2;
+		}
+		return bigSmallCutoff;
+		
 	}
 	
 	public boolean fits(DesignBounds shape) {

@@ -1,3 +1,4 @@
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -47,18 +48,7 @@ public class FractalPainter {
 	public void redrawAll() throws RenderingException {
 		startDrawingWithSize(width,height);
 	}
-	
-	protected class DrawTask {
-		public Graphics2D g;
-		public Design design;
-		public double absoluteScale;
-		public DrawTask(Graphics2D g, Design design, double absoluteScale) {
-			this.g = g;
-			this.design = design;
-			this.absoluteScale = absoluteScale;
-		}
-	}
-	
+		
 	protected LinkedList<DrawTask> toDraw;
 	protected class PaintThread extends Thread {
 		
@@ -67,7 +57,7 @@ public class FractalPainter {
 		
 		public PaintThread(Design design, Graphics2D g, FractalPainter painter) {
 			toDraw = new LinkedList<DrawTask>();
-			toDraw.add(new DrawTask(g, design, 1));
+			addTask(new DrawTask(g, design, 1, Color.white));
 			this.painter = painter;
 		}
 
@@ -79,7 +69,13 @@ public class FractalPainter {
 			double minScale = .5/(width > height ? height : width);
 			while(!toDraw.isEmpty() && !shouldStop) {
 				DrawTask current = toDraw.remove();
+				current.g.setColor(current.backgroundColor);
 				current.design.drawBackground(current.g);
+				if(current.bigColor == current.backgroundColor) {
+					current.g.setColor(current.smallColor);
+					current.g.setStroke(new BasicStroke((float) .005));
+					current.g.draw(current.design.getTemplate().getShape());
+				}
 				numberDrawn++;
 				for(DesignBounds sub : current.design.getSubdesigns()) {
 					Graphics2D newG = (Graphics2D) current.g.create();
@@ -91,9 +87,10 @@ public class FractalPainter {
 						
 					Design subDesign = artist.library().getRandomDesign(sub.getTemplate());
 					double newScale = sub.getScale()*current.absoluteScale;
-					if(newScale >= minScale)
-						addTask(subDesign, newG, newScale);
-					else {
+					if(newScale >= minScale) {
+						DrawTask task = new DrawTask(newG, artist.library().getRandomDesign(sub.getTemplate()), sub, current);
+						addTask(task);
+					} else {
 						//System.out.println("Stopping recurse too small");
 					}
 
@@ -133,10 +130,10 @@ public class FractalPainter {
 			g.drawImage(image, 0,0,Color.BLACK, null);
 	}
 
-	public static final int maxRules = 10000;
-	public synchronized void  addTask(Design design, Graphics2D newG, double absoluteScale) {
+	public static final int maxRules = 30000;
+	public synchronized void  addTask(DrawTask task) {
 		if(toDraw.size() < maxRules) {
-			toDraw.add(new DrawTask(newG, design, absoluteScale));
+			toDraw.add(task);
 		} else {
 			System.err.println("Exceeded toDraw max!");
 		}
