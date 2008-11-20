@@ -69,7 +69,7 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 			moveStart = null;
 			artist.updatePreview(artist.getPreview().getCenter(),  localPoint);
 		}
-		component.repaint();
+		//component.repaint();
 	}
 
 	
