@@ -44,7 +44,11 @@ public class GameControl implements JXInputAxisEventListener,
 	private void initTimers() {
 		cursorTimer = new Timer(100, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateCursor();
+				double xPosition = dev.getAxis(0).getValue();
+				double yPosition = dev.getAxis(1).getValue();
+				if(Math.abs(xPosition) < .2 || Math.abs(yPosition) < .2)
+					return;
+				updateCursor(xPosition, yPosition);
 				
 			}
 		});
@@ -65,13 +69,15 @@ public class GameControl implements JXInputAxisEventListener,
 		
 		ActionListener panTimerActionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				if(Math.abs(dev.getAxis(3).getValue())<0.2 && panTimerX.isRunning()) 
+				double xPosition = dev.getAxis(3).getValue();
+				double yPosition = dev.getAxis(4).getValue();
+				if(Math.abs(xPosition)<0.2 && panTimerX.isRunning()) 
 					panTimerX.stop();
-				if(Math.abs(dev.getAxis(4).getValue())<0.2 && panTimerY.isRunning()) 
+				if(Math.abs(yPosition)<0.2 && panTimerY.isRunning()) 
 					panTimerY.stop();
 				artist.panViewTransform(-dev.getAxis(3).getValue()/20,-dev.getAxis(4).getValue()/20 );
-				updateCursor();
+				if(cursorTimer.isRunning())
+					updateCursor(xPosition, yPosition);
 				try {
 					component.painter().redrawAll();
 				} catch (FractalPainter.RenderingException e1) {
@@ -189,10 +195,18 @@ public class GameControl implements JXInputAxisEventListener,
 		if(ev.getButton() == dev.getButton(5) && dev.getButton(5).getState()) {
 			onButtonRBClicked();
 		}
+		if(ev.getButton() == dev.getButton(7) && dev.getButton(5).getState()) {
+			onButtonStartClicked();
+		}
 		
 	}
 
 	
+
+	private void onButtonStartClicked() {
+		artist.toggleRuleMenu();
+		
+	}
 
 	private void onButtonAClicked() {
 		if(cursorTimer.isRunning()) { //second time button a is pressed
@@ -231,25 +245,73 @@ public class GameControl implements JXInputAxisEventListener,
 	private void onButtonRBClicked() {
 		artist.zoomOriginal();
 	}
-	private void updateCursor() {
-
-		double xPosition = dev.getAxis(0).getValue();
-		double yPosition = dev.getAxis(1).getValue();
-		if(Math.abs(xPosition) < .2 || Math.abs(yPosition) < .2)
-			return;
+	private void updateCursor(double xPosition, double yPosition) {
+		
 		cursor.setLocation(xPosition/50+cursor.getX(), yPosition/50+cursor.getY());
-		artist.updatePreview(getCrosshair(), cursor);
+		artist.updatePreview(artist.pointInFractalCoordinates(getCrosshair()), cursor);
 		System.out.println("cursor"+cursor);
-		component.repaint();
+		//component.repaint();
 		
 	}
+	private void updateCursorOnPan(double xPosition, double yPosition) {
+		double deltaX = artist.pointInFractalCoordinates(getCrosshair()).getX() - artist.getPreview().getCenter().getX();
+		double deltaY = artist.pointInFractalCoordinates(getCrosshair()).getY() - artist.getPreview().getCenter().getY();
+		cursor.setLocation(deltaX+cursor.getX(), deltaY+cursor.getY());
+		artist.updatePreview(artist.pointInFractalCoordinates(getCrosshair()), cursor);
+		System.out.println("cursor"+cursor);
+		//component.repaint();
+		
+	}
+	
 
 	public void changed(JXInputDirectionalEvent ev) {
 		System.out.println( "Directional " + ev.getDirectional().getName() + " changed : direction=" + ev.getDirectional().getDirection()+"value="+ev.getDirectional().getValue()+"delta=" + ev.getDirectionDelta());
 		if(ev.getDirectional().getDirection()==18000 && ev.getDirectional().getValue()==1) {
-			artist.incrementTemplate();
+			directionalDown();
 		}
 		if(ev.getDirectional().getDirection()==0 && ev.getDirectional().getValue()==1) {
+			directionalUp();
+		}
+		if(ev.getDirectional().getDirection()==9000 && ev.getDirectional().getValue()==1) {
+			directionalRight();
+		}
+		if(ev.getDirectional().getDirection()==27000 && ev.getDirectional().getValue()==1) {
+			directionalLeft();
+		}
+		
+	}
+
+	private void directionalLeft() {
+		artist.setMenuColumn(artist.getMenuColumn() - 1);
+		
+	}
+
+	private void directionalRight() {
+		artist.setMenuColumn(artist.getMenuColumn() + 1);
+		
+	}
+
+	private void directionalDown() {
+		if(artist.getMenuColumn() == 0) {
+			artist.incrementCurrentDesignCategory();
+		}
+		if(artist.getMenuColumn() == 1) {
+			artist.incrementCurrentDesign();
+		}
+		if(artist.getMenuColumn() == 2) {
+			artist.incrementTemplate();
+		}		
+		
+	}
+
+	private void directionalUp() {
+		if(artist.getMenuColumn() == 0) {
+			artist.decrementCurrentDesignCategory();
+		}
+		if(artist.getMenuColumn() == 1) {
+			artist.decrementCurrentDesign();
+		}
+		if(artist.getMenuColumn() == 2) {
 			artist.decrementTemplate();
 		}
 		
