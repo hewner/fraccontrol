@@ -3,7 +3,7 @@ import java.awt.geom.*;
 import java.io.Serializable;
 
 
-public class DesignBounds implements Serializable {
+public class DesignBounds implements Serializable, Comparable {
 
 	private static final long serialVersionUID = -8416997179686702686L;
 	protected AffineTransform trans;
@@ -92,6 +92,9 @@ public class DesignBounds implements Serializable {
 		return scale;
 	}
 
-	
+	public int compareTo(Object o) {
+		DesignBounds other = (DesignBounds) o;
+		return Double.compare(scale, other.scale);
+	}
 
 }
