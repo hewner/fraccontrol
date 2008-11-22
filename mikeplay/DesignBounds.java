@@ -35,7 +35,7 @@ public class DesignBounds implements Serializable, Comparable {
 			g.fill(template.getShape());
 			
 			g.scale(.1,.1);
-			g.setColor(Color.black);
+			g.setColor(Color.red);
 			g. drawLine((int) center.getX(), (int) center.getY(), (int) template.getShape().getBounds().getWidth() , (int) template.getShape().getBounds().getHeight());
 			g.scale(10,10);
 			

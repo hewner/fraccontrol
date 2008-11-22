@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -69,12 +70,17 @@ public class FractalPainter {
 			double minScale = .5/(width > height ? height : width);
 			while(!toDraw.isEmpty() && !shouldStop) {
 				DrawTask current = toDraw.remove();
+				Shape background = current.design.getTemplate().getShape();
+				if(!background.intersects(current.g.getClipBounds())) {
+					//this shape is not on screen
+					continue;
+				}
+				current.g.setStroke(new BasicStroke((float) .005));
 				current.g.setColor(current.backgroundColor);
-				current.design.drawBackground(current.g);
+				current.g.fill(background);
 				if(current.bigColor == current.backgroundColor) {
 					current.g.setColor(current.smallColor);
-					current.g.setStroke(new BasicStroke((float) .005));
-					current.g.draw(current.design.getTemplate().getShape());
+					current.g.draw(background);
 				}
 				numberDrawn++;
 				for(DesignBounds sub : current.design.getSubdesigns()) {
@@ -86,7 +92,7 @@ public class FractalPainter {
 					newG.getTransform().preConcatenate(sub.transform());
 						
 					Design subDesign = artist.library().getRandomDesign(sub.getTemplate());
-					double newScale = sub.getScale()*current.absoluteScale;
+					double newScale = sub.getScale()*current.absoluteScale*artist.getZoomLevel();
 					if(newScale >= minScale) {
 						DrawTask task = new DrawTask(newG, artist.library().getRandomDesign(sub.getTemplate()), sub, current);
 						addTask(task);
