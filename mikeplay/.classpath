@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="jxinput.jar"/>
 	<classpathentry kind="lib" path="batik-awt-util.jar"/>
+	<classpathentry kind="lib" path="Downloads/svgSalamander.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

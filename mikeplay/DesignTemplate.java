@@ -1,4 +1,8 @@
+import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 
 
@@ -22,7 +26,16 @@ public class DesignTemplate implements Serializable{
 		return name;
 	}
 	
-	public Shape getShape() {
+	public Area getArea() {
+		Area area = new Area(shape);
+		AffineTransform trans = new AffineTransform();
+		Rectangle2D rect = shape.getBounds2D();
+		trans.scale(1/rect.getWidth(), 1/rect.getHeight());
+		area.transform(trans);
+		return area;
+	}
+	
+	private Shape getShape() {
 		return shape;
 	}
 
@@ -30,8 +43,26 @@ public class DesignTemplate implements Serializable{
 		return library;
 	}
 
+	public Rectangle2D getBounds() {
+		return new Rectangle2D.Double(0,0,1,1);
+	}
+	
 	public double getShapeScaleFactor() {
 		return shapeScaleFactor;
+	}
+
+	public void drawLineShape(Graphics2D g) {
+		Rectangle2D rect = shape.getBounds2D();
+		Graphics2D newG = (Graphics2D) g.create();
+		newG.scale(1/rect.getWidth(), 1/rect.getHeight());
+		newG.draw(shape);
+	}
+	
+	public void drawFillShape(Graphics2D g) {
+		Rectangle2D rect = shape.getBounds2D();
+		Graphics2D newG = (Graphics2D) g.create();
+		newG.scale(1/rect.getWidth(), 1/rect.getHeight());
+		newG.fill(shape);
 	}
 	
 }

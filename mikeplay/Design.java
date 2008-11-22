@@ -83,7 +83,7 @@ public class Design implements Serializable {
 	}
 	
 	public boolean fits(DesignBounds shape) {
-		Area overall = new Area(template.getShape());
+		Area overall = template.getArea();
 		Area area = shape.computeArea();
 		area.subtract(overall);
 		if(!area.isEmpty()) return false;

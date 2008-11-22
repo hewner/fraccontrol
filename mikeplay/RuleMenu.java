@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -32,11 +33,11 @@ public class RuleMenu extends JComponent {
 	public void drawChoice(int choice, int column, Graphics2D g) {
 		g.setColor(Color.white);
 		if(column == 0 || column == 2) {
-			g.fill(artist.getTemplates().get(choice).getShape());
+			artist.getTemplates().get(choice).drawFillShape(g);
 		}
 		if(column == 1) {
 			Design design = getDesigns().get(choice);
-			g.fill(design.getTemplate().getShape());
+			design.getTemplate().drawFillShape(g);
 			g.setColor(Color.gray);
 			for(DesignBounds sub : design.getSubdesigns()) {
 				Graphics2D temp = (Graphics2D) g.create();

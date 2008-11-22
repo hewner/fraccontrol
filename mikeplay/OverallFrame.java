@@ -4,10 +4,20 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URI;
 
+import javax.naming.spi.DirectoryManager;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import org.apache.batik.ext.awt.geom.Polygon2D;
+
+import com.kitfox.svg.Path;
+import com.kitfox.svg.SVGElement;
+import com.kitfox.svg.SVGRoot;
+import com.kitfox.svg.SVGUniverse;
 
 public class OverallFrame extends JFrame {
 	
@@ -68,9 +78,40 @@ public class OverallFrame extends JFrame {
 		triangle.addPoint(1, (float).866); //(1, 0);
 		triangle.addPoint((float) .5,0); //((float).5, (float).866);
 		DesignTemplate triangleTemplate = new DesignTemplate("triangle", triangle, artist.library(), Math.sqrt(3));
-		
+		loadSVGs(artist);
 	}
 
+	protected Path findPath(SVGElement element) {
+		if(element instanceof Path) {
+			return (Path) element;
+		}
+		for(Object child : element.getChildren(null)) {
+			Path path = findPath((SVGElement) child);
+			if(path != null) {
+				return path;
+			}
+		}
+		return null;
+	}
+	
+	protected void loadSVGs(ArtistState artist) {
+		File svgs = new File("svgs");
+		SVGUniverse uni = new SVGUniverse();
+		for(String svgName : svgs.list()) {
+			System.out.println(svgName);
+			try {
+				FileInputStream in = new FileInputStream("svgs" + File.separator + svgName);
+				URI uri = uni.loadSVG(in,svgName);
+				SVGRoot root = uni.getDiagram(uri).getRoot();
+				Path path = findPath(root);
+				new DesignTemplate(svgName,path.getShape(), artist.library(),2/Math.sqrt(2));
+				new Design(Color.YELLOW,artist.library().getTemplate(svgName));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	private static void createAndShowGUI() {
 		OverallFrame app = new OverallFrame();
  
