@@ -28,23 +28,15 @@ public class Design implements Serializable {
 		return subDesigns;
 	}
 	
-	public void drawBackground(Graphics2D g) {
-		//g.setColor(background);
-		Shape rect = template.getShape(); 
-		if(!rect.intersects(g.getClipBounds())) {
-			//this shape is not on screen
-			return;
-		}
-		g.fill(rect);
-	}
-	
 	public void addSubdesign(DesignBounds shape) {
+		bigSmallCutoff = -1;
 		setRightScale(shape);
 		subDesignArea.add(shape.computeArea());
 		subDesigns.add(shape);
 	}
 
 	public void removeSubdesign(DesignBounds shape) {
+		bigSmallCutoff = -1;
 		subDesigns.remove(shape);
 		subDesignArea.subtract(shape.computeArea());
 	}
