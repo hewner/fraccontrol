@@ -70,17 +70,17 @@ public class FractalPainter {
 			double minScale = .5/(width > height ? height : width);
 			while(!toDraw.isEmpty() && !shouldStop) {
 				DrawTask current = toDraw.remove();
-				Shape background = current.design.getTemplate().getShape();
+				Shape background = current.design.getTemplate().getBounds();
 				if(!background.intersects(current.g.getClipBounds())) {
 					//this shape is not on screen
 					continue;
 				}
 				current.g.setStroke(new BasicStroke((float) .005));
 				current.g.setColor(current.backgroundColor);
-				current.g.fill(background);
+				current.design.getTemplate().drawFillShape(current.g);
 				if(current.bigColor == current.backgroundColor) {
 					current.g.setColor(current.smallColor);
-					current.g.draw(background);
+					current.design.getTemplate().drawLineShape(current.g);
 				}
 				numberDrawn++;
 				for(DesignBounds sub : current.design.getSubdesigns()) {

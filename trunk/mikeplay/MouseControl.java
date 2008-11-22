@@ -75,7 +75,7 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 			System.err.println("Rendering exception adding new subcomponent");
 			e1.printStackTrace();
 		}
-		component.repaint();
+		artist.notifyViewTransformChange();
 
 	}
 

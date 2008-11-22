@@ -32,11 +32,11 @@ public class DesignBounds implements Serializable, Comparable {
 	
 	public void draw(Graphics2D g) {
 		if(scale != 0) {
-			g.fill(template.getShape());
+			template.drawFillShape(g);
 			
 			g.scale(.1,.1);
 			g.setColor(Color.red);
-			g. drawLine((int) center.getX(), (int) center.getY(), (int) template.getShape().getBounds().getWidth() , (int) template.getShape().getBounds().getHeight());
+			g. drawLine((int) center.getX(), (int) center.getY(), 1 , 1);
 			g.scale(10,10);
 			
 			
@@ -75,7 +75,7 @@ public class DesignBounds implements Serializable, Comparable {
 	}
 	
 	public Area computeArea() {
-		Area area = new Area(template.getShape());
+		Area area = template.getArea();
 		area.transform(transform());
 		return area;
 	}
