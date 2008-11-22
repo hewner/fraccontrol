@@ -98,7 +98,7 @@ public class OverallFrame extends JFrame {
 		File svgs = new File("svgs");
 		SVGUniverse uni = new SVGUniverse();
 		for(String svgName : svgs.list()) {
-			System.out.println(svgName);
+			if(!svgName.endsWith(".svg")) continue;
 			try {
 				FileInputStream in = new FileInputStream("svgs" + File.separator + svgName);
 				URI uri = uni.loadSVG(in,svgName);
