@@ -57,7 +57,7 @@ public class FractalPainter {
 		
 		public PaintThread(Design design, Graphics2D g, FractalPainter painter) {
 			toDraw = new LinkedList<DrawTask>();
-			addTask(new DrawTask(g, design));
+			addTask(new DrawTask(g, design, artist.getSeed()));
 		}
 
 		public void shouldStop() {
@@ -82,7 +82,6 @@ public class FractalPainter {
 					current.design.getTemplate().drawLineShape(current.g);
 				}
 				numberDrawn++;
-				System.out.println("Number of children:" + current.design.getSubdesigns().size());
 				for(DesignBounds sub : current.design.getSubdesigns()) {
 					Graphics2D newG = (Graphics2D) current.g.create();
 					AffineTransform newT = new AffineTransform(sub.transform());
@@ -91,10 +90,9 @@ public class FractalPainter {
 					newG.setTransform(newT);
 					newG.getTransform().preConcatenate(sub.transform());
 						
-					Design subDesign = artist.library().getRandomDesign(sub.getTemplate());
 					double newScale = sub.getScale()*current.absoluteScale*artist.getZoomLevel();
 					if(newScale >= minScale) {
-						DrawTask task = new DrawTask(newG, artist.library().getRandomDesign(sub.getTemplate()), sub, current);
+						DrawTask task = new DrawTask(newG, artist.library(), sub.getTemplate(), sub, current);
 						addTask(task);
 					} else {
 						//System.out.println("Stopping recurse too small");

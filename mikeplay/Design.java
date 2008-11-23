@@ -54,35 +54,33 @@ public class Design implements Serializable {
 	
 	public boolean isBig(DesignBounds sub) {
 		if(sub.getScale() > bigSmallCutoff) {
-			System.out.println("Returning big " + sub + " " + sub.getScale() + " " + bigSmallCutoff);
 			return true;
 		}
-		System.out.println("Returning small"+ sub + " " + sub.getScale() + " " + bigSmallCutoff);
 		return false;
 	}
 	
 	double bigSmallCutoff;
 	protected double computeBigSmallCutoff() {
-	    if(subDesigns.size() < 2) return -1;
-		if(bigSmallCutoff <= 0) {
-			Collections.sort(subDesigns);
-			double startRange = 0;
-			double bigDifference = 0;
-			double lastScale = 0;
-			for(DesignBounds sub : subDesigns) {
-				if(lastScale != 0) {
-					double curDiff = sub.getScale() - lastScale;
-					if(curDiff > bigDifference) {
-						bigDifference = curDiff;
-						startRange = lastScale;
-					}
+	    if(subDesigns.size() < 2) {
+	    	bigSmallCutoff = -1;
+	    	return -1;
+	    }
+		Collections.sort(subDesigns);
+		double startRange = 0;
+		double bigDifference = 0;
+		double lastScale = 0;
+		for(DesignBounds sub : subDesigns) {
+			if(lastScale != 0) {
+				double curDiff = sub.getScale() - lastScale;
+				if(curDiff > bigDifference) {
+					bigDifference = curDiff;
+					startRange = lastScale;
 				}
-				lastScale = sub.getScale();
 			}
-			bigSmallCutoff = startRange + bigDifference/2;
+			lastScale = sub.getScale();
 		}
+		bigSmallCutoff = startRange + bigDifference/2;
 		return bigSmallCutoff;
-		
 	}
 	
 	public boolean fits(DesignBounds shape) {

@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Random;
+import java.util.Vector;
 
 class DrawTask {
 	public Graphics2D g;
@@ -11,20 +12,25 @@ class DrawTask {
 	public Color backgroundColor;
 	public static Color lBlue = new Color((float) .1,(float).1,(float).5);
 	public static Color dBlue = new Color((float) .0,(float).0,(float).2);
-	public DrawTask(Graphics2D g, Design design) {
+	public int uniqueName;
+	public DrawTask(Graphics2D g, Design design, int seed) {
 		this.g = g;
 		this.design = design;
 		this.absoluteScale = 1;
 		this.bigColor = Color.white;
 		this.smallColor = lBlue;
 		this.backgroundColor = bigColor;
-		
+		this.uniqueName = seed;
 	}
 
-	public DrawTask(Graphics2D g, Design design, DesignBounds sub, DrawTask parent) {
+	public DrawTask(Graphics2D g, DesignTemplateLibrary library, DesignTemplate template, DesignBounds sub, DrawTask parent) {
 		this.g = g;
-		this.design = design;
-		System.out.println("Drawing " + sub);
+		
+		this.uniqueName = (parent.uniqueName + "|" + sub.getDesignNumber()).hashCode();
+		
+		Vector<Design> possibleDesigns = library.getDesignsForTemplate(template);
+		int num = Math.abs(uniqueName) % possibleDesigns.size();
+		this.design = possibleDesigns.get(num);
 		this.absoluteScale = parent.absoluteScale*sub.getScale();
 		if (parent.design.isBig(sub)) {
 			this.bigColor = parent.bigColor;
