@@ -54,17 +54,16 @@ public class FractalPainter {
 	protected class PaintThread extends Thread {
 		
 		public boolean shouldStop = false;
-		public FractalPainter painter;
 		
 		public PaintThread(Design design, Graphics2D g, FractalPainter painter) {
 			toDraw = new LinkedList<DrawTask>();
 			addTask(new DrawTask(g, design, 1, Color.white));
-			this.painter = painter;
 		}
 
 		public void shouldStop() {
 			shouldStop = true;
 		}
+		
 		public void run() {
 			int numberDrawn = 0;
 			double minScale = .5/(width > height ? height : width);

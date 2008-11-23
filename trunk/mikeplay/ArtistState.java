@@ -1,8 +1,8 @@
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.*;
+import java.util.List;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.io.*;
@@ -10,6 +10,12 @@ import java.util.*;
 
 import de.hardcode.jxinput.event.JXInputAxisEvent;
 import de.hardcode.jxinput.event.JXInputButtonEvent;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.dom.GenericDOMImplementation;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.DOMImplementation;
+
 
 
 public class ArtistState {
@@ -24,18 +30,24 @@ public class ArtistState {
 	protected int menuColumn = 0;
 	protected DesignTemplateLibrary library;
 	protected int componentHeight, componentWidth;
+	protected Point2D previewRadius;
 	
 	public ArtistState() {
 		templateNum = 0;
 		rulemenuHidden = false;
 		onMenuChange = new LinkedList<Runnable>();
 		onViewTransformChange = new LinkedList<Runnable>();
+		resetZoomState();
+		library = new DesignTemplateLibrary();
+	}
+
+	public void resetZoomState() {
 		viewTransform = new AffineTransform();
 		double unitLength = 500*.9;
 		viewTransform.scale(unitLength, unitLength);
 		viewTransform.translate(0.05, 0.05);
 		zoomLevel=1.0;
-		library = new DesignTemplateLibrary();
+		notifyViewTransformChange();
 	}
 	
 	public DesignTemplateLibrary library() {
@@ -46,6 +58,29 @@ public class ArtistState {
 		return menuColumn;
 	}
 
+	public void outputToFile() {
+		
+		        // Get a DOMImplementation.
+		 DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+
+		        // Create an instance of org.w3c.dom.Document.
+		String svgNS = "http://www.w3.org/2000/svg";
+		Document document = domImpl.createDocument(svgNS, "svg", null);
+
+		// Create an instance of the SVG Generator.
+		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+
+		// Finally, stream out SVG to the standard output using
+		// UTF-8 encoding.
+		boolean useCSS = true; // we want to use CSS style attributes
+		try {
+			Writer out = new OutputStreamWriter(System.out, "UTF-8");
+			svgGenerator.stream(out, useCSS);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void makeNewDesign() {
 		Design newD = new Design(Color.GREEN,currentDesign.getTemplate());
 		currentDesign = newD;
@@ -239,11 +274,18 @@ public class ArtistState {
 		preview.setCenter(center);
 		updatePreviewForRadius(radius);
 		ensurePreviewDoesNotOverlap();
+		previewRadius = radius;
 	}
 	
 	public void drawPreview(Graphics2D g, FractalPainter painter) {
 		if(preview != null) {
 			Graphics2D newG = (Graphics2D) g.create();
+			AffineTransform tran = viewTransform();
+			Point2D radius = tran.transform(previewRadius,null);
+			Shape shape = new Ellipse2D.Double(radius.getX() - 5, radius.getY()-5, 10, 10);
+			newG.setColor(Color.GREEN);
+			newG.fill(shape);
+			
 			newG.transform(viewTransform());
 			preview.transformGraphics(newG);
 			newG.setColor(Color.PINK);
@@ -253,6 +295,7 @@ public class ArtistState {
 	
 	public void startPreview(Point2D center) {
 		preview = new DesignBounds(center, getCurrentTemplate());
+		previewRadius = center;
 	}
 
 	public void ensurePreviewDoesNotOverlap() {
@@ -324,11 +367,6 @@ public class ArtistState {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
-	}
-
-	public void zoomOriginal() {
-		zoomViewTransform(1/zoomLevel);
 		
 	}
 

@@ -2,6 +2,7 @@
 import java.awt.event.*;
 import java.awt.geom.*;
 
+
 public class MouseControl implements MouseListener, MouseMotionListener, KeyListener  {
 	
 	
@@ -23,7 +24,8 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 			//click on unfilled area
 		}
 	}
-
+	
+	
 	private Point2D localPoint(MouseEvent e) {
 		return artist.pointInFractalCoordinates(e.getPoint());
 	}
@@ -138,7 +140,7 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 			artist.zoomViewTransform(0.95);
 		}
 		if(e.getKeyChar() == 'v') {
-			artist.zoomOriginal();
+			artist.resetZoomState();
 		}
 		if(e.getKeyChar() == 'p') {
 			artist.setMenuColumn(artist.getMenuColumn() + 1);
