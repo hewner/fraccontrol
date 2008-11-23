@@ -142,6 +142,9 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		if(e.getKeyChar() == 'v') {
 			artist.resetZoomState();
 		}
+		if(e.getKeyChar() == 'n') {
+			artist.newSeed();
+		}
 		if(e.getKeyChar() == 'p') {
 			artist.setMenuColumn(artist.getMenuColumn() + 1);
 		}

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.List;
+import java.util.Vector;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
@@ -19,6 +20,7 @@ import org.w3c.dom.DOMImplementation;
 
 
 public class ArtistState {
+
 	protected int templateNum;
 	protected AffineTransform viewTransform;
 	protected DesignBounds preview;
@@ -31,6 +33,14 @@ public class ArtistState {
 	protected DesignTemplateLibrary library;
 	protected int componentHeight, componentWidth;
 	protected Point2D previewRadius;
+	protected int seed;
+	
+	
+	public void newSeed() {
+		Random random = new Random();
+		seed = random.nextInt();
+		notifyViewTransformChange();
+	}
 	
 	public ArtistState() {
 		templateNum = 0;
@@ -39,6 +49,7 @@ public class ArtistState {
 		onViewTransformChange = new LinkedList<Runnable>();
 		resetZoomState();
 		library = new DesignTemplateLibrary();
+		newSeed();
 	}
 
 	public void resetZoomState() {
@@ -53,6 +64,9 @@ public class ArtistState {
 	public DesignTemplateLibrary library() {
 		return library;
 	}
+
+	
+
 	
 	public int getMenuColumn() {
 		return menuColumn;
@@ -332,6 +346,7 @@ public class ArtistState {
 		toSave.zoomLevel = zoomLevel;
 		toSave.viewTransform = viewTransform;
 		toSave.currentDesign = currentDesign;
+		toSave.seed = seed;
 		
 		FileOutputStream fos = null;
 		ObjectOutputStream out = null;
@@ -359,6 +374,7 @@ public class ArtistState {
 			zoomLevel = save.zoomLevel;
 			viewTransform = save.viewTransform;
 			currentDesign = save.currentDesign;
+			seed = save.seed;
 			templateNum = 0;
 			notifyMenuChange();
 			notifyViewTransformChange();
@@ -374,6 +390,10 @@ public class ArtistState {
 		this.componentWidth = width;
 		this.componentHeight = height;
 		
+	}
+
+	public int getSeed() {
+		return seed;
 	}
 	
 }

@@ -10,12 +10,18 @@ public class DesignBounds implements Serializable, Comparable {
 	protected double scale, rotation;
 	protected Point2D center;
 	protected DesignTemplate template;
-
+	protected long designNumber;
+	
 	public DesignBounds(Point2D center, double scale, double rotation, DesignTemplate t) {
 		this.center = center;
 		this.scale = scale;
 		this.rotation = rotation;
 		this.template = t;
+		this.designNumber = getNewDesignNumber();
+	}
+	
+	public long getDesignNumber() {
+		return designNumber;
 	}
 	
 	public DesignTemplate getTemplate() {
@@ -89,4 +95,9 @@ public class DesignBounds implements Serializable, Comparable {
 		return Double.compare(scale, other.scale);
 	}
 
+	private static long currentDesignNumber = 0;
+	private static long getNewDesignNumber() {
+		return currentDesignNumber++;
+	}
+	
 }
