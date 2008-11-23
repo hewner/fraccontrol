@@ -11,10 +11,10 @@ class DrawTask {
 	public Color backgroundColor;
 	public static Color lBlue = new Color((float) .1,(float).1,(float).5);
 	public static Color dBlue = new Color((float) .0,(float).0,(float).2);
-	public DrawTask(Graphics2D g, Design design, double absoluteScale, Color color) {
+	public DrawTask(Graphics2D g, Design design) {
 		this.g = g;
 		this.design = design;
-		this.absoluteScale = absoluteScale;
+		this.absoluteScale = 1;
 		this.bigColor = Color.white;
 		this.smallColor = lBlue;
 		this.backgroundColor = bigColor;
@@ -24,6 +24,7 @@ class DrawTask {
 	public DrawTask(Graphics2D g, Design design, DesignBounds sub, DrawTask parent) {
 		this.g = g;
 		this.design = design;
+		System.out.println("Drawing " + sub);
 		this.absoluteScale = parent.absoluteScale*sub.getScale();
 		if (parent.design.isBig(sub)) {
 			this.bigColor = parent.bigColor;
@@ -37,7 +38,7 @@ class DrawTask {
 			//this.color = new Color((float) (1 - logColor), (float) 1, (float) logColor, (float) 1);
 			this.backgroundColor = this.bigColor;
 		} else {
-			if(parent.bigColor == lBlue) {
+			if(bigColor == lBlue) {
 				this.backgroundColor = dBlue;
 			} else {
 				this.backgroundColor = Color.black;

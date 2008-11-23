@@ -52,7 +52,8 @@ public class FractalComponent extends JComponent {
 		painter.drawCurrentImage(graph);
 		artist.drawPreview((Graphics2D) graph, painter);
 		//draw crosshair
-		graph.setColor(Color.white);
+		//graph.setColor(Color.white);
+		graph.setXORMode(Color.white);
 		int width = getWidth();
 		int height = getHeight();
 				
