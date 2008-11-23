@@ -33,14 +33,6 @@ public class DesignBounds implements Serializable, Comparable {
 	public void draw(Graphics2D g) {
 		if(scale != 0) {
 			template.drawFillShape(g);
-			
-			g.scale(.1,.1);
-			g.setColor(Color.red);
-			g. drawLine((int) center.getX(), (int) center.getY(), 1 , 1);
-			g.scale(10,10);
-			
-			
-			
 		}
 	}
 	

@@ -5,5 +5,8 @@
 	<classpathentry kind="lib" path="jxinput.jar"/>
 	<classpathentry kind="lib" path="batik-awt-util.jar"/>
 	<classpathentry kind="lib" path="svgSalamander.jar"/>
+	<classpathentry kind="lib" path="lib/batik-svg-dom.jar"/>
+	<classpathentry kind="lib" path="lib/batik-svggen.jar"/>
+	<classpathentry kind="lib" path="batik-dom.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
