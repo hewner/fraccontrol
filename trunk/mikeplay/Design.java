@@ -21,6 +21,7 @@ public class Design implements Serializable {
 		subDesigns = new LinkedList<DesignBounds>();
 		subDesignArea = new Area();
 		template = t;
+		bigSmallCutoff = -1;
 		t.getLibrary().addDesign(this);
 	}
 	
@@ -29,16 +30,16 @@ public class Design implements Serializable {
 	}
 	
 	public void addSubdesign(DesignBounds shape) {
-		bigSmallCutoff = -1;
 		setRightScale(shape);
 		subDesignArea.add(shape.computeArea());
 		subDesigns.add(shape);
+		computeBigSmallCutoff();
 	}
 
 	public void removeSubdesign(DesignBounds shape) {
-		bigSmallCutoff = -1;
 		subDesigns.remove(shape);
 		subDesignArea.subtract(shape.computeArea());
+		computeBigSmallCutoff();
 	}
 	
 	protected Area subDesignArea() {
@@ -52,14 +53,16 @@ public class Design implements Serializable {
 	}
 	
 	public boolean isBig(DesignBounds sub) {
-		if(sub.getScale() > bigSmallCutoff()) {
+		if(sub.getScale() > bigSmallCutoff) {
+			System.out.println("Returning big " + sub + " " + sub.getScale() + " " + bigSmallCutoff);
 			return true;
 		}
+		System.out.println("Returning small"+ sub + " " + sub.getScale() + " " + bigSmallCutoff);
 		return false;
 	}
 	
 	double bigSmallCutoff;
-	protected double bigSmallCutoff() {
+	protected double computeBigSmallCutoff() {
 	    if(subDesigns.size() < 2) return -1;
 		if(bigSmallCutoff <= 0) {
 			Collections.sort(subDesigns);
