@@ -86,7 +86,7 @@ public class RuleMenu extends JComponent {
 	
 	public void hideMenu() {
 		menuHidden = true;
-		Animation animation = new Animation(1000, new Point(0,600),this);
+		Animation animation = new Animation(1000, new Point(-1*getWidth(),0),this);
 		animation.startAnimation();
 	}
 	
