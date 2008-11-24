@@ -11,7 +11,7 @@ import java.util.*;
 
 import de.hardcode.jxinput.event.JXInputAxisEvent;
 import de.hardcode.jxinput.event.JXInputButtonEvent;
-import org.apache.batik.svggen.SVGGraphics2D;
+//import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
 
 import org.w3c.dom.Document;
@@ -72,28 +72,28 @@ public class ArtistState {
 		return menuColumn;
 	}
 
-	public void outputToFile() {
-		
-		        // Get a DOMImplementation.
-		 DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
-
-		        // Create an instance of org.w3c.dom.Document.
-		String svgNS = "http://www.w3.org/2000/svg";
-		Document document = domImpl.createDocument(svgNS, "svg", null);
-
-		// Create an instance of the SVG Generator.
-		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-
-		// Finally, stream out SVG to the standard output using
-		// UTF-8 encoding.
-		boolean useCSS = true; // we want to use CSS style attributes
-		try {
-			Writer out = new OutputStreamWriter(System.out, "UTF-8");
-			svgGenerator.stream(out, useCSS);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	public void outputToFile() {
+//		
+//		        // Get a DOMImplementation.
+//		 DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+//
+//		        // Create an instance of org.w3c.dom.Document.
+//		String svgNS = "http://www.w3.org/2000/svg";
+//		Document document = domImpl.createDocument(svgNS, "svg", null);
+//
+//		// Create an instance of the SVG Generator.
+//		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+//
+//		// Finally, stream out SVG to the standard output using
+//		// UTF-8 encoding.
+//		boolean useCSS = true; // we want to use CSS style attributes
+//		try {
+//			Writer out = new OutputStreamWriter(System.out, "UTF-8");
+//			svgGenerator.stream(out, useCSS);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 	public void makeNewDesign() {
 		Design newD = new Design(Color.GREEN,currentDesign.getTemplate());
