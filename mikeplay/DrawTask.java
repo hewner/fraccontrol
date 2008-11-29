@@ -1,18 +1,21 @@
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.util.Random;
 import java.util.Vector;
 
 class DrawTask {
-	public Graphics2D g;
-	public Design design;
-	public double absoluteScale;
-	public Color bigColor;
-	public Color smallColor;
-	public Color backgroundColor;
-	public static Color lBlue = new Color((float) .1,(float).1,(float).5);
-	public static Color dBlue = new Color((float) .0,(float).0,(float).2);
-	public int uniqueName;
+	private Graphics2D g;
+	private Design design;
+	private double absoluteScale;
+	private Color bigColor;
+	private Color smallColor;
+	private Color backgroundColor;
+	private static Color lBlue = new Color((float) .1,(float).1,(float).5);
+	private static Color dBlue = new Color((float) .0,(float).0,(float).2);
+	private int uniqueName;
 	public DrawTask(Graphics2D g, Design design, int seed) {
 		this.g = g;
 		this.design = design;
@@ -23,12 +26,27 @@ class DrawTask {
 		this.uniqueName = seed;
 	}
 
-	public DrawTask(Graphics2D g, DesignTemplateLibrary library, DesignTemplate template, DesignBounds sub, DrawTask parent) {
-		this.g = g;
+	public void drawBackground() {
+		g.setStroke(new BasicStroke((float) .005));
+		g.setColor(backgroundColor);
+		design.getTemplate().drawFillShape(g);
+		if(bigColor == backgroundColor) {
+			g.setColor(smallColor);
+			design.getTemplate().drawLineShape(g);
+		}			
+	}
+	
+	private DrawTask(DesignBounds sub, DrawTask parent) {
+		g = (Graphics2D) parent.g.create();
+		AffineTransform newT = new AffineTransform(sub.transform());
+		AffineTransform oldT = g.getTransform();
+		newT.preConcatenate(oldT);
+		g.setTransform(newT);
+		g.getTransform().preConcatenate(sub.transform());
 		
 		this.uniqueName = (parent.uniqueName + "|" + sub.getDesignNumber()).hashCode();
 		
-		Vector<Design> possibleDesigns = library.getDesignsForTemplate(template);
+		Vector<Design> possibleDesigns = sub.getTemplate().getDesigns();
 		int num = Math.abs(uniqueName) % possibleDesigns.size();
 		this.design = possibleDesigns.get(num);
 		this.absoluteScale = parent.absoluteScale*sub.getScale();
@@ -52,5 +70,21 @@ class DrawTask {
 			
 		}
 	}
+	
+	public Vector<DrawTask> getSubtasks() {
+		Vector<DrawTask> subtasks = new Vector<DrawTask>(design.getSubdesigns().size());
+		for(DesignBounds bounds : design.getSubdesigns()) {
+			subtasks.add(new DrawTask(bounds, this));
+		}
+		return subtasks;
+	}
+	
+	public boolean isInClipBounds() {
+		return design.getTemplate().getBounds().intersects(g.getClipBounds());
+	}
+	
+	public double getAbsoluteScale() {
+		return absoluteScale;
+	}
+	
 }
-

@@ -4,6 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
+import java.util.Vector;
 
 
 public class DesignTemplate implements Serializable{
@@ -11,19 +12,26 @@ public class DesignTemplate implements Serializable{
 	private static final long serialVersionUID = -954256991033058432L;
 	protected String name;
 	protected Shape shape;
-	protected DesignTemplateLibrary library;
 	private double shapeScaleFactor;
+	protected Vector<Design> designs;
 	
-	public DesignTemplate(String name, Shape shape, DesignTemplateLibrary library, double shapeScaleFactor) {
+	public DesignTemplate(String name, Shape shape, double shapeScaleFactor) {
 		this.name = name;
 		this.shape = shape;
-		this.library = library;
 		this.shapeScaleFactor = shapeScaleFactor;
-		library.addTemplate(this);
+		designs = new Vector<Design>();
 	}
 
 	public String getName() {
 		return name;
+	}
+	
+	public Vector<Design> getDesigns() {
+		return designs;
+	}
+	
+	public void addDesign(Design design) {
+		designs.add(design);
 	}
 	
 	public Area getArea() {
@@ -37,10 +45,6 @@ public class DesignTemplate implements Serializable{
 	
 	private Shape getShape() {
 		return shape;
-	}
-
-	public DesignTemplateLibrary getLibrary() {
-		return library;
 	}
 
 	public Rectangle2D getBounds() {
