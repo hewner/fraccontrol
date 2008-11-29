@@ -22,7 +22,7 @@ public class Design implements Serializable {
 		subDesignArea = new Area();
 		template = t;
 		bigSmallCutoff = -1;
-		t.getLibrary().addDesign(this);
+		t.addDesign(this);
 	}
 	
 	public List<DesignBounds> getSubdesigns() {

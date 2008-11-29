@@ -157,7 +157,9 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		if(e.getKeyChar() == 'y') {
 			artist.readFromFile();
 		}
-
+		if(e.getKeyChar() == 't') {
+			artist.outputToSVG();
+		}
 	}
 
 }

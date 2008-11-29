@@ -18,14 +18,6 @@ public class DesignTemplateLibrary implements Serializable {
 		templates.add(template);
 	}
 	
-	public void addDesign(Design d) {
-		map.get(d.getTemplate()).add(d);
-	}
-	
-	public Vector<Design> getDesignsForTemplate(DesignTemplate template) {
-		return map.get(template);
-	}
-	
 	public DesignTemplate getTemplate(String name) {
 		for(DesignTemplate template : map.keySet()) {
 			if(template.getName().equals(name)) {

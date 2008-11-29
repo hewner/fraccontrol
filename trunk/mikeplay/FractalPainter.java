@@ -69,31 +69,15 @@ public class FractalPainter {
 			double minScale = .5/(width > height ? height : width);
 			while(!toDraw.isEmpty() && !shouldStop) {
 				DrawTask current = toDraw.remove();
-				Shape background = current.design.getTemplate().getBounds();
-				if(!background.intersects(current.g.getClipBounds())) {
+				if(!current.isInClipBounds()) {
 					//this shape is not on screen
 					continue;
 				}
-				current.g.setStroke(new BasicStroke((float) .005));
-				current.g.setColor(current.backgroundColor);
-				current.design.getTemplate().drawFillShape(current.g);
-				if(current.bigColor == current.backgroundColor) {
-					current.g.setColor(current.smallColor);
-					current.design.getTemplate().drawLineShape(current.g);
-				}
+				current.drawBackground();
 				numberDrawn++;
-				for(DesignBounds sub : current.design.getSubdesigns()) {
-					Graphics2D newG = (Graphics2D) current.g.create();
-					AffineTransform newT = new AffineTransform(sub.transform());
-					AffineTransform oldT = newG.getTransform();
-					newT.preConcatenate(oldT);
-					newG.setTransform(newT);
-					newG.getTransform().preConcatenate(sub.transform());
-						
-					double newScale = sub.getScale()*current.absoluteScale*artist.getZoomLevel();
-					if(newScale >= minScale) {
-						DrawTask task = new DrawTask(newG, artist.library(), sub.getTemplate(), sub, current);
-						addTask(task);
+				for(DrawTask subTask : current.getSubtasks()) {
+					if(subTask.getAbsoluteScale()*artist.getZoomLevel() >= minScale) {
+						addTask(subTask);
 					} else {
 						//System.out.println("Stopping recurse too small");
 					}

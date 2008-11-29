@@ -72,7 +72,7 @@ public class RuleMenu extends JComponent {
 	}
 
 	private Vector<Design> getDesigns() {
-		return artist.library().getDesignsForTemplate(artist.currentDesign.getTemplate());
+		return artist.currentDesign.getTemplate().getDesigns();
 	}	
 
 	public static final int SPACING = 10;

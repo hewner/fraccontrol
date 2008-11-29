@@ -71,13 +71,16 @@ public class OverallFrame extends JFrame {
 	}
 
 	protected void initLibrary(ArtistState artist) {
-		DesignTemplate squareTemplate = new DesignTemplate("square",new Rectangle2D.Double(0,0,1.0,1.0), artist.library(),2/Math.sqrt(2));
-		DesignTemplate circleTemplate = new DesignTemplate("circle", new Ellipse2D.Double(0,0,1.0,1.0), artist.library(), 2);
+		DesignTemplate squareTemplate = new DesignTemplate("square",new Rectangle2D.Double(0,0,1.0,1.0), 2/Math.sqrt(2));
+		DesignTemplate circleTemplate = new DesignTemplate("circle", new Ellipse2D.Double(0,0,1.0,1.0), 2);
+		artist.library().addTemplate(squareTemplate);
+		artist.library().addTemplate(circleTemplate);
 			Polygon2D triangle = new Polygon2D();
 		triangle.addPoint(0, (float).866);
 		triangle.addPoint(1, (float).866); //(1, 0);
 		triangle.addPoint((float) .5,0); //((float).5, (float).866);
-		DesignTemplate triangleTemplate = new DesignTemplate("triangle", triangle, artist.library(), Math.sqrt(3));
+		DesignTemplate triangleTemplate = new DesignTemplate("triangle", triangle, Math.sqrt(3));
+		artist.library().addTemplate(triangleTemplate);
 		loadSVGs(artist);
 	}
 
@@ -104,8 +107,9 @@ public class OverallFrame extends JFrame {
 				URI uri = uni.loadSVG(in,svgName);
 				SVGRoot root = uni.getDiagram(uri).getRoot();
 				Path path = findPath(root);
-				new DesignTemplate(svgName,path.getShape(), artist.library(),2/Math.sqrt(2));
-				new Design(Color.YELLOW,artist.library().getTemplate(svgName));
+				DesignTemplate template = new DesignTemplate(svgName,path.getShape(), 2/Math.sqrt(2));
+				artist.library().addTemplate(template);
+				new Design(Color.YELLOW,template);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

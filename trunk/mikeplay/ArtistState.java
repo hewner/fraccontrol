@@ -13,6 +13,7 @@ import de.hardcode.jxinput.event.JXInputAxisEvent;
 import de.hardcode.jxinput.event.JXInputButtonEvent;
 //import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DOMImplementation;
@@ -72,28 +73,50 @@ public class ArtistState {
 		return menuColumn;
 	}
 
-//	public void outputToFile() {
-//		
-//		        // Get a DOMImplementation.
-//		 DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
-//
-//		        // Create an instance of org.w3c.dom.Document.
-//		String svgNS = "http://www.w3.org/2000/svg";
-//		Document document = domImpl.createDocument(svgNS, "svg", null);
-//
-//		// Create an instance of the SVG Generator.
-//		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-//
-//		// Finally, stream out SVG to the standard output using
-//		// UTF-8 encoding.
-//		boolean useCSS = true; // we want to use CSS style attributes
-//		try {
-//			Writer out = new OutputStreamWriter(System.out, "UTF-8");
-//			svgGenerator.stream(out, useCSS);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
+	public void outputToSVG() {
+		
+		        // Get a DOMImplementation.
+		 DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+
+		        // Create an instance of org.w3c.dom.Document.
+		String svgNS = "http://www.w3.org/2000/svg";
+		Document document = domImpl.createDocument(svgNS, "svg", null);
+
+		// Create an instance of the SVG Generator.
+		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+		svgGenerator.scale(500, 500);
+		LinkedList<DrawTask> toDraw = new LinkedList<DrawTask>();
+		toDraw.add(new DrawTask(svgGenerator,currentDesign, seed));
+		double minScale = 1.0/300;
+		System.out.println("Starting output");
+		while(!toDraw.isEmpty()) {
+			DrawTask current = toDraw.remove();
+			current.drawBackground();
+			for(DrawTask subTask : current.getSubtasks()) {
+				if(subTask.getAbsoluteScale() >= minScale) {
+					System.out.println(subTask.getAbsoluteScale());
+					toDraw.add(subTask);
+				} else {
+					//System.out.println("Stopping recurse too small");
+				}
+
+			}
+			
+		}
+
+		
+		// Finally, stream out SVG to the standard output using
+		// UTF-8 encoding.
+		boolean useCSS = true; // we want to use CSS style attributes
+		try {
+			FileOutputStream file = new FileOutputStream("mytest.svg");
+			Writer out = new OutputStreamWriter(file, "UTF-8");
+			svgGenerator.stream(out, useCSS);
+			System.out.println("Wrote file");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public void makeNewDesign() {
 		Design newD = new Design(Color.GREEN,currentDesign.getTemplate());
@@ -107,7 +130,7 @@ public class ArtistState {
 		for(DesignTemplate template : library().getTemplates()) {
 			if(template == currentDesign.getTemplate()) {
 				if(previous != null) {
-					currentDesign = library().getDesignsForTemplate(previous).firstElement();
+					currentDesign = previous.getDesigns().firstElement();
 					notifyViewTransformChange();
 					notifyMenuChange();
 				}
@@ -119,7 +142,7 @@ public class ArtistState {
 
 	public void decrementCurrentDesign() {
 		Design previous = null;
-		for(Design design : library().getDesignsForTemplate(currentDesign.getTemplate())) {
+		for(Design design : currentDesign.getTemplate().getDesigns()) {
 			if(design == currentDesign) {
 				if(previous != null) {
 					currentDesign = previous;
@@ -134,7 +157,7 @@ public class ArtistState {
 	
 	public void incrementCurrentDesign() {
 		boolean found = false;
-		for(Design design : library().getDesignsForTemplate(currentDesign.getTemplate())) {
+		for(Design design : currentDesign.getTemplate().getDesigns()) {
 			if(found) {
 				currentDesign = design;
 				notifyViewTransformChange();
@@ -152,7 +175,7 @@ public class ArtistState {
 		boolean found = false;
 		for(DesignTemplate template : library().getTemplates()) {
 			if(found) {
-				currentDesign = library().getDesignsForTemplate(template).firstElement();
+				currentDesign = template.getDesigns().firstElement();
 				notifyViewTransformChange();
 				notifyMenuChange();
 				return;
