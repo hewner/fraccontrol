@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
-public class FractalPainter {
+public class FractalPainter implements FractalModification {
 	protected BufferedImage image;
 	
 	protected int width, height;
@@ -56,90 +56,6 @@ public class FractalPainter {
 		startDrawingWithSize(width,height);
 	}
 	
-	protected class PaintThread implements Runnable {
-		
-		public boolean shouldStop = false;
-		private LinkedList<DrawTask> toDraw;
-		private Thread thread;
-		
-		public PaintThread(Design design, Graphics2D g, FractalPainter painter) {
-			toDraw = new LinkedList<DrawTask>();
-			addTask(new DrawTask(g, design, artist.getSeed()));
-		}
-
-		public synchronized void shouldStop() {
-			shouldStop = true;
-		}
-		
-		public void run() {
-			int numberDrawn = 0;
-			double minScale = .5/(width > height ? height : width);
-			while(shouldRun()) {
-				DrawTask current = removeTask();
-				if(!current.isInClipBounds()) {
-					//this shape is not on screen
-					continue;
-				}
-				current.drawBackground();
-				addToTaskCache(current);
-				numberDrawn++;
-				System.out.println(current.getSubtasks().size() + " subtasks found.");
-				for(DrawTask subTask : current.getSubtasks()) {
-					if(subTask.getAbsoluteScale()*artist.getZoomLevel() >= minScale) {
-						addTask(subTask);
-					} else {
-						//System.out.println("Stopping recurse too small");
-					}
-				}
-	
-			}
-			if(isEmpty()) {
-				System.out.println(this + " finished drawing " + numberDrawn + " shapes.");
-			}
-		}
-		
-		public synchronized boolean isEmpty() {
-			return toDraw.isEmpty();
-		}
-		
-		public synchronized boolean shouldRun() {
-			return !shouldStop && !isEmpty();
-		}
-		
-		public synchronized void addAll(List<DrawTask> tasks) {
-			if(toDraw.size() + tasks.size() < maxRules) {
-				toDraw.addAll(tasks);
-				if((thread == null || !thread.isAlive()) && !shouldStop) {
-					thread = new Thread(this);
-					thread.start();
-				}
-			} else {
-				System.err.println("Exceeded toDraw max!");
-			}
-		}
-		
-		public synchronized void  addTask(DrawTask task) {
-			if(toDraw.size() < maxRules) {
-				toDraw.add(task);
-				if((thread == null || !thread.isAlive()) && !shouldStop) {
-					thread = new Thread(this);
-					thread.start();
-				}
-			} else {
-				System.err.println("Exceeded toDraw max!");
-			}
-		}
-		
-		public synchronized DrawTask removeTask() {
-			return toDraw.remove();
-		}
-		
-		public synchronized boolean isAlive() {
-			return thread.isAlive();
-		}
-		
-	}
-	
 	protected void transformView(AffineTransform trans) throws RenderingException {
 		artist.viewTransform().preConcatenate(trans);
 		redrawAll();
@@ -159,28 +75,45 @@ public class FractalPainter {
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHints(rh);
 		
-		thread = new PaintThread(artist.getCurrentDesign(), g, this);
+		DrawTask root = new DrawTask(g, artist.getCurrentDesign(), artist.getSeed());
+		thread = new PaintThread(root, this);
 	}
 	
 	public void drawCurrentImage(Graphics g) {
 			g.drawImage(image, 0,0,Color.BLACK, null);
 	}
-
-	public static final int maxRules = 30000;
-	
 	
 	private void addToTaskCache(DrawTask task) {
 		LinkedList<DrawTask> list = designToTask.get(task.getDesign());
 		if(list == null) {
 			list = new LinkedList<DrawTask>();
 			designToTask.put(task.getDesign(), list);
-			//task.getDesign().addChangeListener(designChange);
 		}
 		list.add(task);
 	}
-	
-	public boolean isTooSmall(Graphics2D g) {
-		return(g.getTransform().getScaleX() < .25);
+
+	public List<DrawTask> cachedInstancesOf(Design design) {
+		return designToTask.get(design);
 	}
 	
+	public boolean shouldDraw(DrawTask current) {
+		double minScale = .5/(width > height ? height : width);
+		return current.isInClipBounds() && current.getAbsoluteScale()*artist.getZoomLevel() >= minScale;
+	}
+
+	public PaintThread getThread() {
+		return thread;
+	}
+	
+	public void doDraw(DrawTask current) {
+		if(!shouldDraw(current)) return;
+		current.drawBackground();
+		addToTaskCache(current);
+		List<DrawTask> subtasks = current.getSubtasks(); 
+		//System.out.println(subtasks.size() + " subtasks found.");
+		for(DrawTask subTask : current.getSubtasks()) {
+			
+			thread.addTask(this, subTask);
+		}
+	}
 }

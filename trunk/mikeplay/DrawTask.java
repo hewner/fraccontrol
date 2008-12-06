@@ -27,7 +27,7 @@ class DrawTask {
 		this.uniqueName = seed;
 	}
 	
-	private DrawTask(DesignBounds sub, DrawTask parent) {
+	public DrawTask(DesignBounds sub, DrawTask parent) {
 		g = (Graphics2D) parent.g.create();
 		AffineTransform newT = new AffineTransform(sub.transform());
 		AffineTransform oldT = g.getTransform();
