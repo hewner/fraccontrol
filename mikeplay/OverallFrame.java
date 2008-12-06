@@ -26,9 +26,9 @@ public class OverallFrame extends JFrame {
 		
 		setSize(600,500);
 		final ArtistState artist = new ArtistState();
+		FractalPainter painter = new FractalPainter(600,500,artist);
 		try {
 			
-			FractalPainter painter = new FractalPainter(600,500,artist);
 			initLibrary(artist);
 			Design design = new Design(Color.BLUE,artist.library().getTemplate("square"));
 			new Design(Color.RED,artist.library().getTemplate("circle"));
@@ -36,7 +36,7 @@ public class OverallFrame extends JFrame {
 			artist.setCurrentDesign(design);
 			FractalComponent fractalComponent = new FractalComponent(painter,artist); 	
 			getContentPane().add(fractalComponent);
-			MouseControl mouse = new MouseControl(artist);
+			MouseControl mouse = new MouseControl(artist, painter);
 			GameControl game = new GameControl(artist, fractalComponent);
 			fractalComponent.addMouseListener(mouse);
 			fractalComponent.addMouseMotionListener(mouse);

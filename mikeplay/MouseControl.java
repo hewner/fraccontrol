@@ -7,9 +7,11 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 	
 	
 	protected ArtistState artist;
+	protected FractalPainter painter;
 
-	public MouseControl(ArtistState artist) {
+	public MouseControl(ArtistState artist, FractalPainter painter) {
 		this.artist = artist;
+		this.painter = painter;
 	}
 	
 	public void mouseClicked(MouseEvent e) {
@@ -68,9 +70,13 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		FractalComponent component = (FractalComponent) e.getSource();
 		Point2D localPoint = localPoint(e);
 		artist.updatePreview(artist.getPreview().getCenter(), localPoint);
-		artist.getCurrentDesign().addSubdesign(artist.getPreview());
+		FractalModification foo = new AddModification(artist.getCurrentDesign(),artist.getPreview(),painter);
+		System.out.println(foo);
+		//artist.getCurrentDesign().addSubdesign(artist.getPreview());
 		artist.setPreview(null);
-		artist.notifyViewTransformChange();
+		System.out.println("REPAINT");
+		component.repaint();
+		//artist.notifyViewTransformChange();
 
 	}
 
