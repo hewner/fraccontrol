@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.*;
 import java.io.Serializable;
 import java.util.Collections;
@@ -28,7 +30,7 @@ public class Design implements Serializable {
 	public List<DesignBounds> getSubdesigns() {
 		return subDesigns;
 	}
-	
+		
 	public void addSubdesign(DesignBounds shape) {
 		setRightScale(shape);
 		subDesignArea.add(shape.computeArea());
@@ -110,7 +112,7 @@ public class Design implements Serializable {
 		}
 		double smallestFailure = shape.getScale();
 		double largestSuccess = 0;
-		for(int i = 0; i < 20; i++) {
+		for(int i = 0; i < 15; i++) {
 			double newScale = (smallestFailure + largestSuccess)/2;
 			shape.setScale(newScale);
 			if(fits(shape)) {

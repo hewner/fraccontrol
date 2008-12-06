@@ -57,7 +57,6 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 			}
 		} else {
 			moveStart = null;
-			System.out.println("artist.updatePreview(newCenter,  localPoint);");
 			artist.updatePreview(artist.getPreview().getCenter(),  localPoint);
 		}
 		component.repaint();
@@ -71,12 +70,6 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		artist.updatePreview(artist.getPreview().getCenter(), localPoint);
 		artist.getCurrentDesign().addSubdesign(artist.getPreview());
 		artist.setPreview(null);
-		try {
-			component.painter().redrawAll();
-		} catch (FractalPainter.RenderingException e1) {
-			System.err.println("Rendering exception adding new subcomponent");
-			e1.printStackTrace();
-		}
 		artist.notifyViewTransformChange();
 
 	}
