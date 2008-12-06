@@ -16,6 +16,7 @@ class DrawTask {
 	private static Color lBlue = new Color((float) .1,(float).1,(float).5);
 	private static Color dBlue = new Color((float) .0,(float).0,(float).2);
 	private int uniqueName;
+	
 	public DrawTask(Graphics2D g, Design design, int seed) {
 		this.g = g;
 		this.design = design;
@@ -24,16 +25,6 @@ class DrawTask {
 		this.smallColor = lBlue;
 		this.backgroundColor = bigColor;
 		this.uniqueName = seed;
-	}
-
-	public void drawBackground() {
-		g.setStroke(new BasicStroke((float) .005));
-		g.setColor(backgroundColor);
-		design.getTemplate().drawFillShape(g);
-		if(bigColor == backgroundColor) {
-			g.setColor(smallColor);
-			design.getTemplate().drawLineShape(g);
-		}			
 	}
 	
 	private DrawTask(DesignBounds sub, DrawTask parent) {
@@ -58,7 +49,7 @@ class DrawTask {
 			this.smallColor = parent.bigColor;
 		}
 		if(parent.backgroundColor != parent.bigColor) {
-			double logColor = 1 + Math.log(absoluteScale)/10;
+			//double logColor = 1 + Math.log(absoluteScale)/10;
 			//this.color = new Color((float) (1 - logColor), (float) 1, (float) logColor, (float) 1);
 			this.backgroundColor = this.bigColor;
 		} else {
@@ -69,6 +60,16 @@ class DrawTask {
 			}
 			
 		}
+	}
+
+	public void drawBackground() {
+		g.setStroke(new BasicStroke((float) .005));
+		g.setColor(backgroundColor);
+		design.getTemplate().drawFillShape(g);
+		if(bigColor == backgroundColor) {
+			g.setColor(smallColor);
+			design.getTemplate().drawLineShape(g);
+		}			
 	}
 	
 	public Vector<DrawTask> getSubtasks() {
@@ -85,6 +86,10 @@ class DrawTask {
 	
 	public double getAbsoluteScale() {
 		return absoluteScale;
+	}
+
+	public Design getDesign() {
+		return design;
 	}
 	
 }
