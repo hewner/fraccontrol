@@ -12,7 +12,14 @@ public class AddModification implements FractalModification{
 		List<DrawTask> designsToChange = painter.cachedInstancesOf(addTo);
 		LinkedList<DrawTask> drawTasks = new LinkedList<DrawTask>();
 		for(DrawTask task : designsToChange) {
-			drawTasks.add(new DrawTask(subdesignToAdd,task));
+			for(DrawTask subtask : task.getSubtasks()) {
+				if(subtask.setColorScheme(task)) {
+					drawTasks.add(subtask);
+				}
+			}
+			DrawTask newTask = new DrawTask(subdesignToAdd,task);
+			drawTasks.add(newTask);
+			task.addSubtaskAfterward(newTask);
 		}
 		painter.getThread().addAll(this, drawTasks);
 	}
