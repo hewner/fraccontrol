@@ -83,7 +83,7 @@ public class FractalPainter implements FractalModification {
 			g.drawImage(image, 0,0,Color.BLACK, null);
 	}
 	
-	private void addToTaskCache(DrawTask task) {
+	private synchronized void addToTaskCache(DrawTask task) {
 		LinkedList<DrawTask> list = designToTask.get(task.getDesign());
 		if(list == null) {
 			list = new LinkedList<DrawTask>();
@@ -92,13 +92,13 @@ public class FractalPainter implements FractalModification {
 		list.add(task);
 	}
 
-	public List<DrawTask> cachedInstancesOf(Design design) {
-		return designToTask.get(design);
+	public synchronized List<DrawTask> cachedInstancesOf(Design design) {
+		return (List<DrawTask>) designToTask.get(design).clone();
 	}
 	
 	public boolean shouldDraw(DrawTask current) {
-		double minScale = .5/(width > height ? height : width);
-		return current.isInClipBounds() && current.getAbsoluteScale()*artist.getZoomLevel() >= minScale;
+		double minScale = 1.0/(width > height ? height : width);
+		return current.isInClipBounds() && current.getAbsoluteArea()*artist.getZoomLevel() >= minScale;
 	}
 
 	public PaintThread getThread() {
