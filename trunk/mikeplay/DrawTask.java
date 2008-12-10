@@ -103,8 +103,8 @@ class DrawTask {
 		return design.getTemplate().getBounds().intersects(g.getClipBounds());
 	}
 	
-	public double getAbsoluteScale() {
-		return absoluteScale;
+	public double getAbsoluteArea() {
+		return absoluteScale*design.getTemplate().getScaleMultiplier();
 	}
 
 	public Design getDesign() {

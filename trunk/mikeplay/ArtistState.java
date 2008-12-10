@@ -93,8 +93,8 @@ public class ArtistState {
 			DrawTask current = toDraw.remove();
 			current.drawBackground();
 			for(DrawTask subTask : current.getSubtasks()) {
-				if(subTask.getAbsoluteScale() >= minScale) {
-					System.out.println(subTask.getAbsoluteScale());
+				if(subTask.getAbsoluteArea() >= minScale) {
+					System.out.println(subTask.getAbsoluteArea());
 					toDraw.add(subTask);
 				} else {
 					//System.out.println("Stopping recurse too small");
