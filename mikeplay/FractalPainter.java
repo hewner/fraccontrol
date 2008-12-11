@@ -22,6 +22,8 @@ public class FractalPainter implements FractalModification {
 	protected int width, height;
 	protected ArtistState artist;
 	protected Map<Design,LinkedList<DrawTask>> designToTask;
+	private BufferedImage newImage;
+	private long renderTimer;
 	PaintThread thread;
 	
 	public class RenderingException extends Exception {
@@ -47,8 +49,9 @@ public class FractalPainter implements FractalModification {
 		if(height <= 0) throw new RenderingException("Height " + height);
 		this.width = width;
 		this.height = height;
-		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
-		Graphics2D graphics = image.createGraphics();
+		renderTimer = System.currentTimeMillis();
+		newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
+		Graphics2D graphics = newImage.createGraphics();
 		graphics.setClip(0,0,width,height);
 		startDrawing(graphics);
 	}
@@ -75,8 +78,24 @@ public class FractalPainter implements FractalModification {
 		thread = new PaintThread(root, this);
 	}
 	
+	public void previewTransform(AffineTransform transform) {
+		BufferedImage preview = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
+		Graphics2D g = preview.createGraphics();
+		g.transform(transform);
+		g.drawImage(image, 0,0,Color.BLACK, null);
+		image = preview;
+	}
+	
 	public void drawCurrentImage(Graphics g) {
-			g.drawImage(image, 0,0,Color.BLACK, null);
+		if(newImage != null) {
+			long millisElasped = System.currentTimeMillis() - renderTimer;
+			System.out.println(millisElasped);
+			if(millisElasped > 100) {
+				image = newImage;
+				newImage = null;
+			}
+		}
+		g.drawImage(image, 0,0,Color.BLACK, null);
 	}
 	
 	private synchronized void addToTaskCache(DrawTask task) {
