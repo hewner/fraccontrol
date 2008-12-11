@@ -1,24 +1,32 @@
 import java.awt.Graphics2D;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 class PaintThread implements Runnable {
 		
 		private static final int maxRules = 30000; 
 		private boolean shouldStop = false;
-		private class ModAndTask {
+		private class ModAndTask implements Comparable<ModAndTask> {
 			public FractalModification mod;
 			public DrawTask task;
 			public ModAndTask(FractalModification mod, DrawTask task) {
 				this.mod = mod;
 				this.task = task;
 			}
+			@Override
+			public int compareTo(ModAndTask arg0) {
+				double myArea = task.getAbsoluteArea();
+				double otherArea = arg0.task.getAbsoluteArea();
+				//we want larger things first
+				return Double.compare(otherArea, myArea);
+			}
 		}
-		private LinkedList<ModAndTask> toDraw;
+		private PriorityQueue<ModAndTask> toDraw;
 		private Thread thread;
 		
 		public PaintThread(DrawTask root, FractalPainter painter) {
-			toDraw = new LinkedList<ModAndTask>();
+			toDraw = new PriorityQueue<ModAndTask>();
 			addTask(painter, root);
 		}
 
