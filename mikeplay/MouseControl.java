@@ -72,7 +72,6 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		artist.updatePreview(artist.getPreview().getCenter(), localPoint);
 		if(localPoint.distance(artist.getPreview().getCenter()) > .0001) {
 			FractalModification foo = new AddModification(artist.getCurrentDesign(),artist.getPreview(),painter);
-			System.out.println(foo);
 			//artist.getCurrentDesign().addSubdesign(artist.getPreview());
 			artist.setPreview(null);
 			component.repaint();	

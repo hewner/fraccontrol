@@ -248,17 +248,17 @@ public class GameControl implements JXInputAxisEventListener,
 	private void onButtonAClicked() {
 		if(cursorTimer.isRunning()) { //second time button a is pressed
 			cursorTimer.stop();
-			
-			artist.updatePreview(artist.pointInFractalCoordinates(getCrosshair()),getCursor());
+			Point2D localPoint = artist.pointInFractalCoordinates(getCrosshair());
+			artist.updatePreview(localPoint,getCursor());
 			artist.getCurrentDesign().addSubdesign(artist.getPreview());
 			artist.setPreview(null);
-			
-			try {
-				component.painter().redrawAll();
-			} catch (FractalPainter.RenderingException e1) {
-				System.err.println("Rendering exception adding new subcomponent");
-				e1.printStackTrace();
+			if(localPoint.distance(artist.getPreview().getCenter()) > .0001) {
+				FractalModification foo = new AddModification(artist.getCurrentDesign(),artist.getPreview(),component.painter);
+				//artist.getCurrentDesign().addSubdesign(artist.getPreview());
+				artist.setPreview(null);
+				component.repaint();	
 			}
+	
 		} else { //first time button a is pressed
 			deltaX = deltaY = 0;
 			artist.startPreview(artist.pointInFractalCoordinates(getCrosshair()));
