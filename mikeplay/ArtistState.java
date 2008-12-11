@@ -86,12 +86,12 @@ public class ArtistState {
 		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
 		svgGenerator.scale(500, 500);
 		LinkedList<DrawTask> toDraw = new LinkedList<DrawTask>();
-		toDraw.add(new DrawTask(svgGenerator,currentDesign, seed));
+		toDraw.add(new DrawTask(currentDesign, seed));
 		double minScale = 1.0/300;
 		System.out.println("Starting output");
 		while(!toDraw.isEmpty()) {
 			DrawTask current = toDraw.remove();
-			current.drawBackground();
+			current.drawBackground(svgGenerator);
 			for(DrawTask subTask : current.getSubtasks()) {
 				if(subTask.getAbsoluteArea() >= minScale) {
 					System.out.println(subTask.getAbsoluteArea());
@@ -269,7 +269,6 @@ public class ArtistState {
 		if(viewTransform != null) {
 			viewTransform.translate(xPan/zoomLevel, yPan/zoomLevel);
 			notifyViewTransformChange();
-			//System.out.println("shift="+xPan);
 		}
 	}
 	

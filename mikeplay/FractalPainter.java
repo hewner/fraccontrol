@@ -17,6 +17,7 @@ import java.util.TreeMap;
 
 public class FractalPainter implements FractalModification {
 	protected BufferedImage image;
+	protected Graphics2D g;
 	
 	protected int width, height;
 	protected ArtistState artist;
@@ -46,7 +47,7 @@ public class FractalPainter implements FractalModification {
 		if(height <= 0) throw new RenderingException("Height " + height);
 		this.width = width;
 		this.height = height;
-		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
 		Graphics2D graphics = image.createGraphics();
 		graphics.setClip(0,0,width,height);
 		startDrawing(graphics);
@@ -56,17 +57,12 @@ public class FractalPainter implements FractalModification {
 		startDrawingWithSize(width,height);
 	}
 	
-	protected void transformView(AffineTransform trans) throws RenderingException {
-		artist.viewTransform().preConcatenate(trans);
-		redrawAll();
-	}
-	
-	
 	protected void startDrawing(Graphics2D g) throws RenderingException {
 		if(thread != null) {			
 			thread.shouldStop();
 			while(thread.isAlive()) {} //ensure we have only 1 thread processing
 		}
+		this.g = g;
 		designToTask = new HashMap<Design,LinkedList<DrawTask>>();
 		g.setColor(Color.WHITE);
 		g.transform(artist.viewTransform());
@@ -75,7 +71,7 @@ public class FractalPainter implements FractalModification {
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHints(rh);
 		
-		DrawTask root = new DrawTask(g, artist.getCurrentDesign(), artist.getSeed());
+		DrawTask root = new DrawTask(artist.getCurrentDesign(), artist.getSeed());
 		thread = new PaintThread(root, this);
 	}
 	
@@ -96,9 +92,9 @@ public class FractalPainter implements FractalModification {
 		return (List<DrawTask>) designToTask.get(design).clone();
 	}
 	
-	public boolean shouldDraw(DrawTask current) {
+	public boolean shouldDraw(Graphics2D g, DrawTask current) {
 		double minScale = 1.0/(width > height ? height : width);
-		return current.isInClipBounds() && current.getAbsoluteArea()*artist.getZoomLevel() >= minScale;
+		return current.isInClipBounds(g) && current.getAbsoluteArea()*artist.getZoomLevel() >= minScale;
 	}
 
 	public PaintThread getThread() {
@@ -106,8 +102,8 @@ public class FractalPainter implements FractalModification {
 	}
 	
 	public void doDraw(DrawTask current) {
-		if(!shouldDraw(current)) return;
-		current.drawBackground();
+		if(!shouldDraw(g, current)) return;
+		current.drawBackground(g);
 		addToTaskCache(current);
 		List<DrawTask> subtasks = current.getSubtasks(); 
 		//System.out.println(subtasks.size() + " subtasks found.");

@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.Vector;
 
 class DrawTask {
-	private Graphics2D g;
 	private Design design;
 	private double absoluteScale;
 	private Color bigColor;
@@ -18,23 +17,21 @@ class DrawTask {
 	private int uniqueName;
 	private Vector<DrawTask> subtasks;
 	private DesignBounds sub;
+	private AffineTransform transform;
 	
-	public DrawTask(Graphics2D g, Design design, int seed) {
-		this.g = g;
+	public DrawTask(Design design, int seed) {
 		this.design = design;
 		this.absoluteScale = 1;
 		this.uniqueName = seed;
+		transform = new AffineTransform();
 		setColorScheme(null);
 	}
 	
 	public DrawTask(DesignBounds sub, DrawTask parent) {
 		this.sub = sub;
-		g = (Graphics2D) parent.g.create();
-		AffineTransform newT = new AffineTransform(sub.transform());
-		AffineTransform oldT = g.getTransform();
-		newT.preConcatenate(oldT);
-		g.setTransform(newT);
-		g.getTransform().preConcatenate(sub.transform());
+		transform = new AffineTransform(sub.transform());
+		AffineTransform oldT = parent.transform;
+		transform.preConcatenate(oldT);
 		setColorScheme(parent);
 		this.uniqueName = (parent.uniqueName + "|" + sub.getDesignNumber()).hashCode();
 		
@@ -74,13 +71,15 @@ class DrawTask {
 		return oldBigColor != bigColor;		
 	}
 	
-	public void drawBackground() {
-		g.setStroke(new BasicStroke((float) .005));
-		g.setColor(backgroundColor);
-		design.getTemplate().drawFillShape(g);
+	public void drawBackground(Graphics2D g) {
+		Graphics2D myG = (Graphics2D) g.create();
+		myG.transform(transform);
+		myG.setStroke(new BasicStroke((float) .005));
+		myG.setColor(backgroundColor);
+		design.getTemplate().drawFillShape(myG);
 		if(bigColor == backgroundColor) {
-			g.setColor(smallColor);
-			design.getTemplate().drawLineShape(g);
+			myG.setColor(smallColor);
+			design.getTemplate().drawLineShape(myG);
 		}			
 	}
 	
@@ -99,8 +98,10 @@ class DrawTask {
 		return subtasks;
 	}
 	
-	public boolean isInClipBounds() {
-		return design.getTemplate().getBounds().intersects(g.getClipBounds());
+	public boolean isInClipBounds(Graphics2D g) {
+		Graphics2D myG = (Graphics2D) g.create();
+		myG.transform(transform);
+		return design.getTemplate().getBounds().intersects(myG.getClipBounds());
 	}
 	
 	public double getAbsoluteArea() {
