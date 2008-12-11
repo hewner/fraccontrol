@@ -42,7 +42,8 @@ public class OverallFrame extends JFrame {
 			fractalComponent.addMouseMotionListener(mouse);
 			addKeyListener(mouse);
 			painter.startDrawing();
-
+			//TODO: Fix this crap
+			artist.painter = painter;
 		} catch (FractalPainter.RenderingException e) {
 			System.err.println("Initial setup caused a rendering exception");
 			System.err.println(e.toString());

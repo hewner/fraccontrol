@@ -6,6 +6,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 
@@ -35,6 +36,7 @@ public class ArtistState {
 	protected int componentHeight, componentWidth;
 	protected Point2D previewRadius;
 	protected int seed;
+	protected FractalPainter painter;
 	
 	
 	public void newSeed() {
@@ -252,10 +254,23 @@ public class ArtistState {
 			//System.out.println("zoomlevel=" +zoomLevel);
 			Point2D crosshair = new Point2D.Double(componentWidth/2,componentHeight/2);
 			Point2D crosshairFractalCoordinates = pointInFractalCoordinates(crosshair);
+			//new ZoomModification(painter, zoom);
+			AffineTransform previewZoom = new AffineTransform();
+			previewZoom.translate(componentWidth/2,componentHeight/2);
+			previewZoom.scale(zoomFactor,zoomFactor);
+			previewZoom.translate(-componentWidth/2,-componentHeight/2);
+			painter.previewTransform(previewZoom);
 			
-			viewTransform.translate(crosshairFractalCoordinates.getX(),crosshairFractalCoordinates.getY());
-			viewTransform.scale(zoomFactor,zoomFactor);
-			viewTransform.translate(-crosshairFractalCoordinates.getX(),-crosshairFractalCoordinates.getY());
+			
+			AffineTransform zoom = new AffineTransform();
+			zoom.translate(crosshairFractalCoordinates.getX(),crosshairFractalCoordinates.getY());
+			
+			zoom.scale(zoomFactor,zoomFactor);
+
+			zoom.translate(-crosshairFractalCoordinates.getX(),-crosshairFractalCoordinates.getY());
+			
+			viewTransform.concatenate(zoom);
+			
 			notifyViewTransformChange();
 			//System.out.println("shift="+zoomFactor/(50*zoomLevel));
 			
@@ -267,6 +282,9 @@ public class ArtistState {
 	
 	public void panViewTransform(double xPan, double yPan) {
 		if(viewTransform != null) {
+			AffineTransform previewTransform = new AffineTransform();
+			previewTransform.translate((xPan/zoomLevel)*viewTransform.getScaleX(), (yPan/zoomLevel)*viewTransform.getScaleY());
+			painter.previewTransform(previewTransform);
 			viewTransform.translate(xPan/zoomLevel, yPan/zoomLevel);
 			notifyViewTransformChange();
 		}
