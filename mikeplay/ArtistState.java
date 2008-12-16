@@ -75,7 +75,7 @@ public class ArtistState {
 		return menuColumn;
 	}
 
-	public void outputToSVG() {
+	public void outputToSVG(File filename) {
 		
 		        // Get a DOMImplementation.
 		 DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
@@ -111,7 +111,7 @@ public class ArtistState {
 		// UTF-8 encoding.
 		boolean useCSS = true; // we want to use CSS style attributes
 		try {
-			FileOutputStream file = new FileOutputStream("mytest.svg");
+			FileOutputStream file = new FileOutputStream(filename);
 			Writer out = new OutputStreamWriter(file, "UTF-8");
 			svgGenerator.stream(out, useCSS);
 			System.out.println("Wrote file");
@@ -379,7 +379,7 @@ public class ArtistState {
 		return currentDesign;
 	}
 	
-	public void writeToFile() {
+	public void writeToFile(File file) {
 		
 		StateToSave toSave = new StateToSave();
 		toSave.library = library();
@@ -392,7 +392,7 @@ public class ArtistState {
 		ObjectOutputStream out = null;
 		
 		try {
-			fos = new FileOutputStream("test.dat");
+			fos = new FileOutputStream(file);
 			out = new ObjectOutputStream(fos);
 			out.writeObject(toSave);
 			out.close();
@@ -401,12 +401,12 @@ public class ArtistState {
 		}
 	}
 	
-	public void readFromFile() {
+	public void readFromFile(File file) {
 		FileInputStream fos = null;
 		ObjectInputStream out = null;
 		StateToSave save;
 		try {
-			fos = new FileInputStream("test.dat");
+			fos = new FileInputStream(file);
 			out = new ObjectInputStream(fos);
 			save = (StateToSave) out.readObject();
 			out.close();

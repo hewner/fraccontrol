@@ -150,15 +150,6 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		if(e.getKeyChar() == 'o') {
 			artist.setMenuColumn(artist.getMenuColumn() - 1);
 		}
-		if(e.getKeyChar() == 'u') {
-			artist.writeToFile();
-		}
-		if(e.getKeyChar() == 'y') {
-			artist.readFromFile();
-		}
-		if(e.getKeyChar() == 't') {
-			artist.outputToSVG();
-		}
 	}
 
 }
