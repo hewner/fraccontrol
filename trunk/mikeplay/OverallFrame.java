@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.MenuBar;
 import java.awt.Point;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
@@ -12,6 +13,8 @@ import java.net.URI;
 import javax.naming.spi.DirectoryManager;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
+import javax.swing.JMenuBar;
+
 import org.apache.batik.ext.awt.geom.Polygon2D;
 
 import com.kitfox.svg.Path;
@@ -69,6 +72,8 @@ public class OverallFrame extends JFrame {
 				System.exit(0);
 			}
 		});
+		JMenuBar bar = new OverallMenu(artist);
+		setJMenuBar(bar);
 	}
 
 	protected void initLibrary(ArtistState artist) {

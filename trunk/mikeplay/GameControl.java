@@ -235,12 +235,9 @@ public class GameControl implements JXInputAxisEventListener,
 	}
 
 	private void onButtonBackClicked() {
-		artist.writeToFile();
-		
 	}
 
 	private void onButtonStartClicked() {
-		artist.readFromFile();
 		
 	}
 	

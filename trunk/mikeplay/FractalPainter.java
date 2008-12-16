@@ -22,9 +22,13 @@ public class FractalPainter implements FractalModification {
 	protected int width, height;
 	protected ArtistState artist;
 	protected Map<Design,LinkedList<DrawTask>> designToTask;
+	PaintThread thread;
+	
+	private AffineTransform previewedTransform;
+	private BufferedImage previewedOriginal;
 	private BufferedImage newImage;
 	private long renderTimer;
-	PaintThread thread;
+	
 	
 	public class RenderingException extends Exception {
 		public RenderingException(String error) {
@@ -81,8 +85,14 @@ public class FractalPainter implements FractalModification {
 	public void previewTransform(AffineTransform transform) {
 		BufferedImage preview = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
 		Graphics2D g = preview.createGraphics();
-		g.transform(transform);
-		g.drawImage(image, 0,0,Color.BLACK, null);
+		if(previewedOriginal != null) {
+			previewedTransform.concatenate(transform);
+		} else {
+			previewedTransform = transform;
+			previewedOriginal = image;
+		}
+		g.transform(previewedTransform);
+		g.drawImage(previewedOriginal, 0,0,Color.BLACK, null);
 		image = preview;
 	}
 	
@@ -92,6 +102,8 @@ public class FractalPainter implements FractalModification {
 			System.out.println(millisElasped);
 			if(millisElasped > 100) {
 				image = newImage;
+				previewedOriginal = null;
+                previewedTransform = null;
 				newImage = null;
 			}
 		}
