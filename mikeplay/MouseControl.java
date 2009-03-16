@@ -19,8 +19,9 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		DesignBounds subDesign = artist.getCurrentDesign().subDesignUnder(localPoint);
 		if(subDesign != null) {
 			if(e.getClickCount() == 2) {
-				artist.getCurrentDesign().removeSubdesign(subDesign);
-				artist.notifyViewTransformChange();
+				new RemoveModification(artist.getCurrentDesign(), subDesign,painter);
+				//artist.getCurrentDesign().removeSubdesign(subDesign);
+				//artist.notifyViewTransformChange();
 			}
 		} else {
 			//click on unfilled area
@@ -71,7 +72,7 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		Point2D localPoint = localPoint(e);
 		artist.updatePreview(artist.getPreview().getCenter(), localPoint);
 		if(localPoint.distance(artist.getPreview().getCenter()) > .0001) {
-			FractalModification foo = new AddModification(artist.getCurrentDesign(),artist.getPreview(),painter);
+			AddModification foo = new AddModification(artist.getCurrentDesign(),artist.getPreview(),painter);
 			//artist.getCurrentDesign().addSubdesign(artist.getPreview());
 			artist.setPreview(null);
 			component.repaint();	

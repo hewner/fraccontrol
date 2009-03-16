@@ -1,8 +1,10 @@
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
 
@@ -11,17 +13,18 @@ class DrawTask {
 	private double absoluteScale;
 	private Color bigColor;
 	private Color smallColor;
-	private Color backgroundColor;
+	protected Color backgroundColor;
 	private static Color lBlue = new Color((float) .1,(float).1,(float).5);
 	private static Color dBlue = new Color((float) .0,(float).0,(float).2);
 	private int uniqueName;
 	private Vector<DrawTask> subtasks;
-	private DesignBounds sub;
+	protected DesignBounds sub;
+	protected Color parentBackground;
 	private AffineTransform transform;
 	
 	public DrawTask(Design design, int seed) {
 		this.design = design;
-		this.absoluteScale = 1;
+		this.absoluteScale = 1; 
 		this.uniqueName = seed;
 		transform = new AffineTransform();
 		setColorScheme(null);
@@ -47,7 +50,9 @@ class DrawTask {
 			this.bigColor = Color.white;
 			this.smallColor = lBlue;
 			this.backgroundColor = bigColor;
+			this.parentBackground = Color.black;
 		} else {
+			this.parentBackground = parent.backgroundColor;
 			if (parent.design.isBig(sub)) {
 				this.bigColor = parent.bigColor;
 				this.smallColor = parent.smallColor;
@@ -71,22 +76,44 @@ class DrawTask {
 		return oldBigColor != bigColor;		
 	}
 	
+	public void drawErase(Graphics2D g) {
+		Graphics2D myG = (Graphics2D) g.create();
+		myG.transform(transform);
+		myG.setColor(parentBackground);
+		design.getTemplate().drawFillShape(myG);
+	}
+	
 	public void drawBackground(Graphics2D g) {
 		Graphics2D myG = (Graphics2D) g.create();
 		myG.transform(transform);
-		myG.setStroke(new BasicStroke((float) .005));
 		myG.setColor(backgroundColor);
 		design.getTemplate().drawFillShape(myG);
 		if(bigColor == backgroundColor) {
 			myG.setColor(smallColor);
+			myG.setStroke(new BasicStroke((float) .005));
 			design.getTemplate().drawLineShape(myG);
-		}			
+		}
 	}
 	
 	public void addSubtaskAfterward(DrawTask sub) {
 		if(subtasks != null) {
 			subtasks.add(sub);
 		}
+	}
+	
+	public DrawTask removeSubtaskAfterward(DesignBounds bounds) {
+		if(subtasks != null) {
+			Iterator<DrawTask> i = subtasks.iterator();
+			while(i.hasNext()) {
+				DrawTask subtask = i.next();
+				if(subtask.sub == bounds) {
+					i.remove();
+					return subtask;
+				}
+			}
+			throw new RuntimeException("DesignBounds not found in task");
+		}
+		return null;
 	}
 	
 	public Vector<DrawTask> getSubtasks() {

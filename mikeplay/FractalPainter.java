@@ -54,7 +54,7 @@ public class FractalPainter implements FractalModification {
 		this.width = width;
 		this.height = height;
 		renderTimer = System.currentTimeMillis();
-		newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
+		newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics = newImage.createGraphics();
 		graphics.setClip(0,0,width,height);
 		startDrawing(graphics);
@@ -83,7 +83,7 @@ public class FractalPainter implements FractalModification {
 	}
 	
 	public void previewTransform(AffineTransform transform) {
-		BufferedImage preview = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
+		BufferedImage preview = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = preview.createGraphics();
 		if(previewedOriginal != null) {
 			previewedTransform.concatenate(transform);
@@ -130,6 +130,10 @@ public class FractalPainter implements FractalModification {
 
 	public PaintThread getThread() {
 		return thread;
+	}
+	
+	public Graphics2D getGraphics() {
+		return g;
 	}
 	
 	public void doDraw(DrawTask current) {
