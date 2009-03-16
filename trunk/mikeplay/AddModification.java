@@ -2,7 +2,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class AddModification implements FractalModification{
+public class AddModification {
 	
 	FractalPainter painter;
 	
@@ -21,12 +21,7 @@ public class AddModification implements FractalModification{
 			drawTasks.add(newTask);
 			task.addSubtaskAfterward(newTask);
 		}
-		painter.getThread().addAll(this, drawTasks);
-	}
-
-	public void doDraw(DrawTask current) {
-		//System.out.println(current + "ZZZZZ" + painter);
-		painter.doDraw(current);
+		painter.getThread().addAll(painter, drawTasks);
 	}
 
 }

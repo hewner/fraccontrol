@@ -65,7 +65,7 @@ public class OverallFrame extends JFrame {
 				repaint();
 			}
 		});
-		
+		ruleMenu.toggleMenu();
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent arg0) {
 				//we want to behave as if the user had clicked "Exit"

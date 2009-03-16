@@ -435,5 +435,10 @@ public class ArtistState {
 	public int getSeed() {
 		return seed;
 	}
+
+	public void setCurrentTemplate(DesignTemplate template) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

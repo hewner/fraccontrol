@@ -131,4 +131,5 @@ public class Design implements Serializable {
 	public DesignTemplate getTemplate() {
 		return template;
 	}
+
 }

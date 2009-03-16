@@ -250,7 +250,7 @@ public class GameControl implements JXInputAxisEventListener,
 			artist.getCurrentDesign().addSubdesign(artist.getPreview());
 			artist.setPreview(null);
 			if(localPoint.distance(artist.getPreview().getCenter()) > .0001) {
-				FractalModification foo = new AddModification(artist.getCurrentDesign(),artist.getPreview(),component.painter);
+				AddModification foo = new AddModification(artist.getCurrentDesign(),artist.getPreview(),component.painter);
 				//artist.getCurrentDesign().addSubdesign(artist.getPreview());
 				artist.setPreview(null);
 				component.repaint();	
@@ -267,9 +267,7 @@ public class GameControl implements JXInputAxisEventListener,
 	private void onButtonBClicked() {
 		DesignBounds subDesign = artist.getCurrentDesign().subDesignUnder(artist.pointInFractalCoordinates(getCrosshair()));
 		if(subDesign != null) {
-			System.out.println("delete"+getCrosshair());
-			artist.getCurrentDesign().removeSubdesign(subDesign);
-			artist.notifyViewTransformChange();
+			new RemoveModification(artist.getCurrentDesign(), subDesign,component.painter);
 		} else {
 			//click on unfilled area
 		}
