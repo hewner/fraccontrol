@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.Icon;
 
@@ -49,7 +51,7 @@ public class DesignTemplateIcon implements Icon {
 		template.drawLineShape(newG);
 		if(design != null) {
 			for(DesignBounds sub : design.getSubdesigns()) {
-				Graphics2D temp = (Graphics2D) g.create();
+				Graphics2D temp = (Graphics2D) newG.create();
 				sub.transformGraphics(temp);
 				sub.draw(temp);
 			}
