@@ -6,6 +6,8 @@ import javax.swing.*;
 
 public class OverallMenu extends JMenuBar {
 	ArtistState artist;
+	JMenu designMenu;
+	
 	public OverallMenu(ArtistState newArtist) {
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem load = new JMenuItem("Load fractal");
@@ -38,15 +40,11 @@ public class OverallMenu extends JMenuBar {
 			}
 		});
 		fileMenu.add(exit);
-		JMenu designMenu = new JMenu("Designs");
-		final JMenuItem changeDesign = new JMenuItem("Change Design");
-		changeDesign.setIcon(new DesignTemplateIcon(artist.getCurrentDesign(),25));
-		artist.onMenuChange(new Runnable() {
-			public void run() {
-				changeDesign.setIcon(new DesignTemplateIcon(artist.getCurrentDesign(),25));
-			}
-		});
-		designMenu.add(changeDesign);
+		
+
+		designMenu = new JMenu("Designs");
+		generateDesignMenu();
+		
 		JMenu brushMenu = new JMenu("Tools");
 		brushMenu.setIcon(new DesignTemplateIcon(artist.getCurrentTemplate(),25));
 		ButtonGroup group = new ButtonGroup();
@@ -63,6 +61,64 @@ public class OverallMenu extends JMenuBar {
 		add(fileMenu);
 		add(designMenu);
 		add(brushMenu);
+		
+	}
+
+	protected void generateDesignMenu() {
+		designMenu.removeAll();
+		for(DesignTemplate template : artist.getTemplates()) {
+			Icon icon = new DesignTemplateIcon(template,30);
+			JMenu item = new JMenu("");
+			item.setIcon(icon);
+			//item.addActionListener(new TemplateChanger(templateNum, template, brushMenu));
+			//templateNum++;
+			designMenu.add(item);
+			for(Design design : template.getDesigns()) {
+				JMenuItem designMenuItem = new JMenuItem(new DesignTemplateIcon(design,30));
+				item.add(designMenuItem);
+				DesignChanger listener = new DesignChanger(designMenuItem,design);
+				design.addActionListener(listener);
+				designMenuItem.addActionListener(listener);
+			}
+			JMenuItem newItem = new JMenuItem("New...");
+			newItem.addActionListener(new NewDesign(template));
+			item.add(newItem);
+		}
+	}
+	
+	private class NewDesign implements ActionListener {
+		protected DesignTemplate template;
+		
+		public NewDesign(DesignTemplate template) {
+			this.template = template;
+		}
+		public void actionPerformed(ActionEvent e) {
+			artist.makeNewDesign(template);
+			generateDesignMenu();
+			
+		}
+	}
+	
+	private class DesignChanger implements ActionListener{
+
+		protected JMenuItem menu;
+		protected Design design;
+		
+		public DesignChanger(JMenuItem menu, Design design) {
+			this.menu = menu;
+			this.design = design;
+		}
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() instanceof Design) {
+				menu.setIcon(new DesignTemplateIcon(design,30));
+				menu.repaint();
+			}
+			if (e.getSource() == menu) {
+				artist.setCurrentDesign(design);
+			}
+			
+		}
+		
 		
 	}
 	

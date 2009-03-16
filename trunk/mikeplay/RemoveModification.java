@@ -15,7 +15,9 @@ public class RemoveModification implements FractalModification
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		/*g = painter.getGraphics();
+		/* Busted removal code that does not work because children screw up the re-render
+		  
+		 g = painter.getGraphics();
 		List<DrawTask> designsToChange = painter.cachedInstancesOf(removeFrom);
 		LinkedList<DrawTask> undrawTasks = new LinkedList<DrawTask>();
 		for(DrawTask task : designsToChange) {

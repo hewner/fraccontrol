@@ -67,9 +67,6 @@ public class ArtistState {
 	public DesignTemplateLibrary library() {
 		return library;
 	}
-
-	
-
 	
 	public int getMenuColumn() {
 		return menuColumn;
@@ -121,10 +118,14 @@ public class ArtistState {
 	}
 	
 	public void makeNewDesign() {
+		makeNewDesign(currentDesign.getTemplate());
+	}
+	
+	public void makeNewDesign(DesignTemplate template) {
 		Design newD = new Design(Color.GREEN,currentDesign.getTemplate());
 		currentDesign = newD;
 		notifyViewTransformChange();
-		notifyMenuChange();
+		notifyMenuChange();		
 	}
 	
 	public void decrementCurrentDesignCategory() {
@@ -141,7 +142,7 @@ public class ArtistState {
 			previous = template;
 		}
 	}
-
+	
 	public void decrementCurrentDesign() {
 		Design previous = null;
 		for(Design design : currentDesign.getTemplate().getDesigns()) {
