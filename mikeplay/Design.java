@@ -17,11 +17,10 @@ public class Design implements Serializable {
 	protected List<DesignBounds> subDesigns;
 	protected transient Area subDesignArea;
 	protected DesignTemplate template;
-	protected List<ActionListener> listeners;
+	protected transient List<ActionListener> listeners;
 	
 	protected Design(DesignTemplate t) {
 		subDesigns = new LinkedList<DesignBounds>();
-		listeners = new LinkedList<ActionListener>();
 		subDesignArea = new Area();
 		template = t;
 		bigSmallCutoff = -1;
@@ -32,15 +31,15 @@ public class Design implements Serializable {
 	}
 		
 	public void addActionListener(ActionListener l) {
-		listeners.add(l);
+		listeners().add(l);
 	}
 	
 	public void removeActionListener(ActionListener l) {
-		listeners.remove(l);
+		listeners().remove(l);
 	}
 	
 	public void onChange() {
-		for(ActionListener l : listeners) {
+		for(ActionListener l : listeners()) {
 			l.actionPerformed(new ActionEvent(this,0,"Design change"));
 		}
 	}
@@ -58,6 +57,13 @@ public class Design implements Serializable {
 		subDesignArea.subtract(shape.computeArea());
 		computeBigSmallCutoff();
 		onChange();
+	}
+	
+	protected List<ActionListener> listeners() {
+		if(listeners == null) {
+			listeners = new LinkedList<ActionListener>();
+		}
+		return listeners;
 	}
 	
 	protected Area subDesignArea() {

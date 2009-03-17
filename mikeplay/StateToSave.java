@@ -9,5 +9,6 @@ public class StateToSave implements Serializable{
 	public Double zoomLevel;
 	public AffineTransform viewTransform;
 	public Design currentDesign;
+	public DesignTemplate currentTemplate;
 	public int seed;
 }
