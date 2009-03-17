@@ -122,7 +122,7 @@ public class ArtistState {
 	}
 	
 	public void makeNewDesign(DesignTemplate template) {
-		Design newD = new Design(Color.GREEN,currentDesign.getTemplate());
+		Design newD = template.addDesign();
 		currentDesign = newD;
 		notifyViewTransformChange();
 		notifyMenuChange();		

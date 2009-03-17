@@ -31,12 +31,8 @@ public class OverallFrame extends JFrame {
 		final ArtistState artist = new ArtistState();
 		FractalPainter painter = new FractalPainter(600,500,artist);
 		try {
-			
 			initLibrary(artist);
-			Design design = new Design(Color.BLUE,artist.library().getTemplate("square"));
-			new Design(Color.RED,artist.library().getTemplate("circle"));
-			new Design(Color.YELLOW,artist.library().getTemplate("triangle"));
-			artist.setCurrentDesign(design);
+			artist.setCurrentDesign(artist.library().getTemplates().getFirst().getDesigns().firstElement());
 			FractalComponent fractalComponent = new FractalComponent(painter,artist); 	
 			getContentPane().add(fractalComponent);
 			MouseControl mouse = new MouseControl(artist, painter);
@@ -53,25 +49,6 @@ public class OverallFrame extends JFrame {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		final RuleMenu ruleMenu = new RuleMenu(artist);
-		getLayeredPane().setLayer(ruleMenu, JLayeredPane.PALETTE_LAYER);
-		getLayeredPane().add(ruleMenu);
-		ruleMenu.setSize(300,getHeight());
-		
-		artist.onMenuChange( new Runnable() {
-			public void run() {
-				if(ruleMenu.isHidden() != artist.isRuleMenuHidden())
-					ruleMenu.toggleMenu();
-				repaint();
-			}
-		});
-		ruleMenu.toggleMenu();
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent arg0) {
-				//we want to behave as if the user had clicked "Exit"
-				System.exit(0);
-			}
-		});
 		JMenuBar bar = new OverallMenu(artist);
 		setJMenuBar(bar);
 	}
@@ -87,39 +64,6 @@ public class OverallFrame extends JFrame {
 		triangle.addPoint((float) .5,0); //((float).5, (float).866);
 		DesignTemplate triangleTemplate = new DesignTemplate("triangle", triangle, Math.sqrt(3),.866*0.5);
 		artist.library().addTemplate(triangleTemplate);
-		loadSVGs(artist);
-	}
-
-	protected Path findPath(SVGElement element) {
-		if(element instanceof Path) {
-			return (Path) element;
-		}
-		for(Object child : element.getChildren(null)) {
-			Path path = findPath((SVGElement) child);
-			if(path != null) {
-				return path;
-			}
-		}
-		return null;
-	}
-	
-	protected void loadSVGs(ArtistState artist) {
-		File svgs = new File("svgs");
-		SVGUniverse uni = new SVGUniverse();
-		for(String svgName : svgs.list()) {
-			if(!svgName.endsWith(".svg")) continue;
-			try {
-				FileInputStream in = new FileInputStream("svgs" + File.separator + svgName);
-				URI uri = uni.loadSVG(in,svgName);
-				SVGRoot root = uni.getDiagram(uri).getRoot();
-				Path path = findPath(root);
-				DesignTemplate template = new DesignTemplate(svgName,path.getShape(), 2/Math.sqrt(2),1);
-				artist.library().addTemplate(template);
-				new Design(Color.YELLOW,template);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 	
 	private static void createAndShowGUI() {

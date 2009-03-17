@@ -22,18 +22,21 @@ public class DesignTemplate implements Serializable{
 		this.shapeScaleFactor = shapeScaleFactor;
 		this.scaleMultiplier = scaleMultiplier;
 		designs = new Vector<Design>();
+		addDesign();
 	}
 
+	public Design addDesign() {
+		Design design = new Design(this);
+		designs.add(design);
+		return design;
+	}
+	
 	public String getName() {
 		return name;
 	}
 	
 	public Vector<Design> getDesigns() {
 		return designs;
-	}
-	
-	public void addDesign(Design design) {
-		designs.add(design);
 	}
 	
 	public Area getArea() {

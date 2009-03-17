@@ -7,6 +7,7 @@ import javax.swing.*;
 public class OverallMenu extends JMenuBar {
 	ArtistState artist;
 	JMenu designMenu;
+	JMenu brushMenu;
 	
 	public OverallMenu(ArtistState newArtist) {
 		JMenu fileMenu = new JMenu("File");
@@ -33,6 +34,14 @@ public class OverallMenu extends JMenuBar {
 				doExport();
 			}
 		});
+		JMenuItem importTemplate = new JMenuItem("Import template from SVG");
+		fileMenu.add(importTemplate);
+		importTemplate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				doImportFromSVG();
+			}
+		});
+		
 		JMenuItem exit = new JMenuItem("Exit");
 		exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -45,7 +54,22 @@ public class OverallMenu extends JMenuBar {
 		designMenu = new JMenu("Designs");
 		generateDesignMenu();
 		
-		JMenu brushMenu = new JMenu("Tools");
+		brushMenu = new JMenu("Tools");
+		generateBrushMenu();
+		
+		add(fileMenu);
+		add(designMenu);
+		add(brushMenu);
+		artist.library().addListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				generateDesignMenu();
+				generateBrushMenu();
+			}			
+		});
+	}
+
+	protected void generateBrushMenu() {
+		brushMenu.removeAll();
 		brushMenu.setIcon(new DesignTemplateIcon(artist.getCurrentTemplate(),25));
 		ButtonGroup group = new ButtonGroup();
 		int templateNum = 0;
@@ -57,13 +81,8 @@ public class OverallMenu extends JMenuBar {
 			templateNum++;
 			brushMenu.add(item);			
 		}
-		
-		add(fileMenu);
-		add(designMenu);
-		add(brushMenu);
-		
 	}
-
+	
 	protected void generateDesignMenu() {
 		designMenu.removeAll();
 		for(DesignTemplate template : artist.getTemplates()) {
@@ -95,6 +114,7 @@ public class OverallMenu extends JMenuBar {
 		public void actionPerformed(ActionEvent e) {
 			artist.makeNewDesign(template);
 			generateDesignMenu();
+			generateBrushMenu();
 			
 		}
 	}
@@ -148,6 +168,19 @@ public class OverallMenu extends JMenuBar {
 	    }	
 	}
 
+	private void doImportFromSVG() {
+	    JFileChooser fc = new JFileChooser();
+	    
+	    if(fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+	    	try {
+				artist.library().templateFromFile(fc.getSelectedFile());
+			} catch (Exception e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Error loading file: " + e, "Cannot load file", JOptionPane.ERROR_MESSAGE);
+			}
+	    }	
+	}
+	
 	private void doSave() {
 	    JFileChooser fc = new JFileChooser();
 	    

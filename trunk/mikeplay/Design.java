@@ -19,14 +19,12 @@ public class Design implements Serializable {
 	protected DesignTemplate template;
 	protected List<ActionListener> listeners;
 	
-	public Design(Color background, DesignTemplate t) {
-		this.background = background;
+	protected Design(DesignTemplate t) {
 		subDesigns = new LinkedList<DesignBounds>();
 		listeners = new LinkedList<ActionListener>();
 		subDesignArea = new Area();
 		template = t;
 		bigSmallCutoff = -1;
-		t.addDesign(this);
 	}
 	
 	public List<DesignBounds> getSubdesigns() {
