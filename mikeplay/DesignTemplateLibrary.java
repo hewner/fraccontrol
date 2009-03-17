@@ -1,5 +1,17 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.*;
+
+import com.kitfox.svg.Path;
+import com.kitfox.svg.SVGElement;
+import com.kitfox.svg.SVGRoot;
+import com.kitfox.svg.SVGUniverse;
 
 
 public class DesignTemplateLibrary implements Serializable {
@@ -7,15 +19,20 @@ public class DesignTemplateLibrary implements Serializable {
 	private static final long serialVersionUID = -7673206905863074000L;
 	protected Map<DesignTemplate,Vector<Design>> map;
 	protected LinkedList<DesignTemplate> templates;
+	protected SVGUniverse uni;
+	protected List<ActionListener> listeners;
 	
 	public DesignTemplateLibrary() {
 		map = new HashMap<DesignTemplate,Vector<Design>>();
 		templates = new LinkedList<DesignTemplate>();
+		listeners = new LinkedList<ActionListener>();
+		uni = new SVGUniverse();
 	}
 
 	public void addTemplate(DesignTemplate template) {
 		map.put(template, new Vector<Design>());
 		templates.add(template);
+		onChange();
 	}
 	
 	public DesignTemplate getTemplate(String name) {
@@ -27,8 +44,49 @@ public class DesignTemplateLibrary implements Serializable {
 		throw new RuntimeException("Attempt to access unknown template " + name);
 	}
 	
+	protected Path findPath(SVGElement element) {
+		if(element instanceof Path) {
+			return (Path) element;
+		}
+		for(Object child : element.getChildren(null)) {
+			Path path = findPath((SVGElement) child);
+			if(path != null) {
+				return path;
+			}
+		}
+		return null;
+	}
+
+	
+	public void templateFromFile(File file) throws Exception {
+		FileInputStream in = new FileInputStream(file);
+		URI uri;
+		uri = uni.loadSVG(in,file.getName());
+		SVGRoot root = uni.getDiagram(uri).getRoot();
+		Path path = findPath(root);
+		if(path == null)
+			throw new Exception("Could not find path in file");
+		DesignTemplate template = new DesignTemplate(file.getName(),path.getShape(), 2/Math.sqrt(2),1);
+		addTemplate(template);
+	}
+	
+	
 	public LinkedList<DesignTemplate> getTemplates() {
 		return templates;
+	}
+	
+	public void addListener(ActionListener l) {
+		listeners.add(l);
+	}
+	public void removeListener(ActionListener l) {
+		listeners.remove(l);
+	}
+	
+	public void onChange() {
+		ActionEvent e = new ActionEvent(this, 0,"Library changed");
+		for(ActionListener l: listeners) {
+			l.actionPerformed(e);
+		}
 	}
 	
 }
