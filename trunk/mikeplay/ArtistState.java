@@ -33,7 +33,6 @@ public class ArtistState {
 	protected Design currentDesign;
 	protected DesignTemplate currentTemplate;
 	protected Double zoomLevel;
-	protected int menuColumn = 0;
 	protected DesignTemplateLibrary library;
 	protected int componentHeight, componentWidth;
 	protected Point2D previewRadius;
@@ -67,10 +66,6 @@ public class ArtistState {
 	
 	public DesignTemplateLibrary library() {
 		return library;
-	}
-	
-	public int getMenuColumn() {
-		return menuColumn;
 	}
 
 	public void outputToSVG(File filename) {
@@ -206,45 +201,18 @@ public class ArtistState {
 		return preview;
 	}
 	
-	private void updatePreviewForRadius(Point2D localPoint) {
-		
-		double dis = preview.getCenter().distance(localPoint);
-		double scale =  preview.getTemplate().getShapeScaleFactor()*dis;    //2*dis/1.4142;
-		
-		preview.setScale(scale);
-		preview.setRotation(Math.atan2(preview.getCenter().getY()-localPoint.getY(), preview.getCenter().getX()-localPoint.getX()));
+	public Point2D getPreviewRadius() {
+		return previewRadius;
 	}
-	
+		
 	public void updatePreview(Point2D center, Point2D radius) {
-		preview.setCenter(center);
-		updatePreviewForRadius(radius);
-		ensurePreviewDoesNotOverlap();
+		preview.setToMaxSize(center, radius, currentDesign);
 		previewRadius = radius;
-	}
-	
-	public void drawPreview(Graphics2D g, FractalPainter painter) {
-		if(preview != null) {
-			Graphics2D newG = (Graphics2D) g.create();
-			AffineTransform tran = viewTransform();
-			Point2D radius = tran.transform(previewRadius,null);
-			Shape shape = new Ellipse2D.Double(radius.getX() - 5, radius.getY()-5, 10, 10);
-			newG.setColor(Color.GREEN);
-			newG.fill(shape);
-			
-			newG.transform(viewTransform());
-			preview.transformGraphics(newG);
-			newG.setColor(Color.PINK);
-			preview.draw(newG);
-		}
 	}
 	
 	public void startPreview(Point2D center) {
 		preview = new DesignBounds(center, getCurrentTemplate());
 		previewRadius = center;
-	}
-
-	public void ensurePreviewDoesNotOverlap() {
-		currentDesign.transformSubdesign(getPreview());
 	}
 	
 	public Point2D pointInFractalCoordinates(Point2D point) {

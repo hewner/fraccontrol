@@ -1,7 +1,10 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
@@ -50,7 +53,7 @@ public class FractalComponent extends JComponent {
 	}
 	public void paintComponent(Graphics graph) {
 		painter.drawCurrentImage(graph);
-		artist.drawPreview((Graphics2D) graph, painter);
+		drawPreview((Graphics2D) graph);
 		//draw crosshair
 		//graph.setColor(Color.white);
 		graph.setXORMode(Color.white);
@@ -61,12 +64,29 @@ public class FractalComponent extends JComponent {
 		
 		graph.drawLine(ch.x, ch.y-5, ch.x, ch.y+5); //vertical line
 		graph.drawLine(ch.x-5, ch.y, ch.x+5, ch.y); //horizontal line
-		
-		
-
 	}
 	
 	public FractalPainter painter() {
 		return painter;
+	}
+	
+	public void drawPreview(Graphics2D g) {
+		
+		DesignBounds preview = artist.getPreview();
+		if(preview == null) return;
+		
+		Graphics2D newG = (Graphics2D) g.create();
+		AffineTransform tran = artist.viewTransform();
+		Point2D radius = tran.transform(artist.getPreviewRadius(),null);
+		Shape shape = new Ellipse2D.Double(radius.getX() - 5, radius.getY()-5, 10, 10);
+		newG.setColor(Color.GREEN);
+		newG.fill(shape);
+		
+		newG.transform(artist.viewTransform());
+		preview.transformGraphics(newG);
+		newG.setColor(Color.PINK);
+		preview.draw(newG);
+
+		
 	}
 }
