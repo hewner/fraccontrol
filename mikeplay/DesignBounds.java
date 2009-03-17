@@ -100,4 +100,18 @@ public class DesignBounds implements Serializable, Comparable {
 		return currentDesignNumber++;
 	}
 	
+	
+	public void setToMaxSize(Point2D center, Point2D radius, Design design) {
+		setCenter(center);
+		//determine largest possible size given center and radius
+		double dis = center.distance(radius);
+		double scale =  getTemplate().getShapeScaleFactor()*dis;   
+		
+		setScale(scale);
+		setRotation(Math.atan2(center.getY()-radius.getY(), center.getX()-radius.getX()));
+		//now scale down if beyond what is possible given other parts of the design
+		design.transformSubdesign(this);		
+	}
+	
+	
 }
