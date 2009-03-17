@@ -32,11 +32,12 @@ public class OverallFrame extends JFrame {
 		FractalPainter painter = new FractalPainter(600,500,artist);
 		try {
 			initLibrary(artist);
-			artist.setCurrentDesign(artist.library().getTemplates().getFirst().getDesigns().firstElement());
+			DesignTemplate firstTemplate = artist.library().getTemplates().getFirst();
+			artist.setCurrentDesign(firstTemplate.getDesigns().firstElement());
+			artist.setCurrentTemplate(firstTemplate);
 			FractalComponent fractalComponent = new FractalComponent(painter,artist); 	
 			getContentPane().add(fractalComponent);
 			MouseControl mouse = new MouseControl(artist, painter);
-			GameControl game = new GameControl(artist, fractalComponent);
 			fractalComponent.addMouseListener(mouse);
 			fractalComponent.addMouseMotionListener(mouse);
 			addKeyListener(mouse);

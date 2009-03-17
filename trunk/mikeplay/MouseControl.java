@@ -93,34 +93,6 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 	
 	public void keyTyped(KeyEvent e) {
 	
-		if(e.getKeyChar() == 'a') {
-			if(artist.getMenuColumn() == 0) {
-				artist.decrementCurrentDesignCategory();
-			}
-			if(artist.getMenuColumn() == 1) {
-				artist.decrementCurrentDesign();
-			}
-			if(artist.getMenuColumn() == 2) {
-				artist.decrementTemplate();
-			}
-		}
-		if(e.getKeyChar() == 'i') {
-			artist.makeNewDesign();
-		}
-		if(e.getKeyChar() == 'z') {
-			if(artist.getMenuColumn() == 0) {
-				artist.incrementCurrentDesignCategory();
-			}
-			if(artist.getMenuColumn() == 1) {
-				artist.incrementCurrentDesign();
-			}
-			if(artist.getMenuColumn() == 2) {
-				artist.incrementTemplate();
-			}		
-		}
-		if(e.getKeyChar() == 'q') {
-			artist.toggleRuleMenu();
-		}
 		if(e.getKeyChar() == 'l') {
 			artist.panViewTransform(-.05, 0);
 		}
@@ -144,12 +116,6 @@ public class MouseControl implements MouseListener, MouseMotionListener, KeyList
 		}
 		if(e.getKeyChar() == 'n') {
 			artist.newSeed();
-		}
-		if(e.getKeyChar() == 'p') {
-			artist.setMenuColumn(artist.getMenuColumn() + 1);
-		}
-		if(e.getKeyChar() == 'o') {
-			artist.setMenuColumn(artist.getMenuColumn() - 1);
 		}
 	}
 

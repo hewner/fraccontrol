@@ -17,6 +17,9 @@ public class DesignTemplateIcon implements Icon {
 	private int size;
 	
 	public DesignTemplateIcon(DesignTemplate template, int size) {
+		if(template == null) {
+			System.out.println("Die");
+		}
 		this.template = template;
 		this.size = size;
 	}

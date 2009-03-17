@@ -4,12 +4,12 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 
-public class OverallMenu extends JMenuBar {
+public class OverallMenu extends JMenuBar implements ActionListener {
 	ArtistState artist;
 	JMenu designMenu;
 	JMenu brushMenu;
-	
-	public OverallMenu(ArtistState newArtist) {
+	 
+	public OverallMenu(ArtistState newArtist)  {
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem load = new JMenuItem("Load fractal");
 		this.artist = newArtist;
@@ -60,14 +60,15 @@ public class OverallMenu extends JMenuBar {
 		add(fileMenu);
 		add(designMenu);
 		add(brushMenu);
-		artist.library().addListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				generateDesignMenu();
-				generateBrushMenu();
-			}			
-		});
+		artist.addLibraryListener(this);
 	}
 
+	public void actionPerformed(ActionEvent e) {
+		generateDesignMenu();
+		generateBrushMenu();
+	}			
+
+	
 	protected void generateBrushMenu() {
 		brushMenu.removeAll();
 		brushMenu.setIcon(new DesignTemplateIcon(artist.getCurrentTemplate(),25));
@@ -77,7 +78,7 @@ public class OverallMenu extends JMenuBar {
 			Icon icon = new DesignTemplateIcon(template,30);
 			JMenuItem item = new JCheckBoxMenuItem(icon);
 			group.add(item);
-			item.addActionListener(new TemplateChanger(templateNum, template, brushMenu));
+			item.addActionListener(new TemplateChanger(template, brushMenu));
 			templateNum++;
 			brushMenu.add(item);			
 		}
@@ -144,17 +145,15 @@ public class OverallMenu extends JMenuBar {
 	
 	private class TemplateChanger implements ActionListener {
 		
-		private int templateNum;
 		private DesignTemplate template;
 		private JMenu menu;
 		
-		public TemplateChanger(int templateNum, DesignTemplate template, JMenu menu) {
-			this.templateNum = templateNum;
+		public TemplateChanger(DesignTemplate template, JMenu menu) {
 			this.template = template;
 			this.menu = menu;
 		}
 		public void actionPerformed(ActionEvent e) {
-			artist.setCurrentTemplate(templateNum);
+			artist.setCurrentTemplate(template);
 			menu.setIcon(new DesignTemplateIcon(template,25));
 		}
 		
@@ -174,6 +173,7 @@ public class OverallMenu extends JMenuBar {
 	    if(fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 	    	try {
 				artist.library().templateFromFile(fc.getSelectedFile());
+				artist.notifyLibraryChange();
 			} catch (Exception e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(null, "Error loading file: " + e, "Cannot load file", JOptionPane.ERROR_MESSAGE);
@@ -195,5 +195,5 @@ public class OverallMenu extends JMenuBar {
 	    if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 	    	artist.readFromFile(fc.getSelectedFile());
 	    }		
-	}
+	}	
 }

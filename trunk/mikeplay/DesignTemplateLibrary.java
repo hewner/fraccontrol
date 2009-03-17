@@ -19,20 +19,23 @@ public class DesignTemplateLibrary implements Serializable {
 	private static final long serialVersionUID = -7673206905863074000L;
 	protected Map<DesignTemplate,Vector<Design>> map;
 	protected LinkedList<DesignTemplate> templates;
-	protected SVGUniverse uni;
-	protected List<ActionListener> listeners;
+	protected transient SVGUniverse uni;
 	
 	public DesignTemplateLibrary() {
 		map = new HashMap<DesignTemplate,Vector<Design>>();
-		templates = new LinkedList<DesignTemplate>();
-		listeners = new LinkedList<ActionListener>();
-		uni = new SVGUniverse();
+		templates = new LinkedList<DesignTemplate>();		
 	}
 
+	private SVGUniverse svgUniverse() {
+		if(uni == null) {
+			uni = new SVGUniverse();
+		}
+		return uni;
+	}
+	
 	public void addTemplate(DesignTemplate template) {
 		map.put(template, new Vector<Design>());
 		templates.add(template);
-		onChange();
 	}
 	
 	public DesignTemplate getTemplate(String name) {
@@ -61,8 +64,8 @@ public class DesignTemplateLibrary implements Serializable {
 	public void templateFromFile(File file) throws Exception {
 		FileInputStream in = new FileInputStream(file);
 		URI uri;
-		uri = uni.loadSVG(in,file.getName());
-		SVGRoot root = uni.getDiagram(uri).getRoot();
+		uri = svgUniverse().loadSVG(in,file.getName());
+		SVGRoot root = svgUniverse().getDiagram(uri).getRoot();
 		Path path = findPath(root);
 		if(path == null)
 			throw new Exception("Could not find path in file");
@@ -73,20 +76,6 @@ public class DesignTemplateLibrary implements Serializable {
 	
 	public LinkedList<DesignTemplate> getTemplates() {
 		return templates;
-	}
-	
-	public void addListener(ActionListener l) {
-		listeners.add(l);
-	}
-	public void removeListener(ActionListener l) {
-		listeners.remove(l);
-	}
-	
-	public void onChange() {
-		ActionEvent e = new ActionEvent(this, 0,"Library changed");
-		for(ActionListener l: listeners) {
-			l.actionPerformed(e);
-		}
 	}
 	
 }

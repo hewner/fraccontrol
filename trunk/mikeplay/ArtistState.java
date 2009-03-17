@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.util.List;
 import java.util.Vector;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
@@ -23,13 +25,13 @@ import org.w3c.dom.DOMImplementation;
 
 public class ArtistState {
 
-	protected int templateNum;
 	protected AffineTransform viewTransform;
 	protected DesignBounds preview;
 	protected boolean rulemenuHidden;
-	protected List<Runnable> onMenuChange;
+	protected List<ActionListener> libraryListeners;
 	protected List<Runnable> onViewTransformChange;
 	protected Design currentDesign;
+	protected DesignTemplate currentTemplate;
 	protected Double zoomLevel;
 	protected int menuColumn = 0;
 	protected DesignTemplateLibrary library;
@@ -37,7 +39,7 @@ public class ArtistState {
 	protected Point2D previewRadius;
 	protected int seed;
 	protected FractalPainter painter;
-	
+
 	
 	public void newSeed() {
 		Random random = new Random();
@@ -46,9 +48,8 @@ public class ArtistState {
 	}
 	
 	public ArtistState() {
-		templateNum = 0;
 		rulemenuHidden = false;
-		onMenuChange = new LinkedList<Runnable>();
+		libraryListeners = new LinkedList<ActionListener>();
 		onViewTransformChange = new LinkedList<Runnable>();
 		resetZoomState();
 		library = new DesignTemplateLibrary();
@@ -117,98 +118,17 @@ public class ArtistState {
 		}
 	}
 	
-	public void makeNewDesign() {
-		makeNewDesign(currentDesign.getTemplate());
-	}
-	
 	public void makeNewDesign(DesignTemplate template) {
 		Design newD = template.addDesign();
 		currentDesign = newD;
-		notifyViewTransformChange();
-		notifyMenuChange();		
-	}
-	
-	public void decrementCurrentDesignCategory() {
-		DesignTemplate previous = null;
-		for(DesignTemplate template : library().getTemplates()) {
-			if(template == currentDesign.getTemplate()) {
-				if(previous != null) {
-					currentDesign = previous.getDesigns().firstElement();
-					notifyViewTransformChange();
-					notifyMenuChange();
-				}
-				return;
-			}
-			previous = template;
-		}
-	}
-	
-	public void decrementCurrentDesign() {
-		Design previous = null;
-		for(Design design : currentDesign.getTemplate().getDesigns()) {
-			if(design == currentDesign) {
-				if(previous != null) {
-					currentDesign = previous;
-					notifyViewTransformChange();
-					notifyMenuChange();
-				}
-				return;
-			}
-			previous = design;
-		}		
-	}
-	
-	public void incrementCurrentDesign() {
-		boolean found = false;
-		for(Design design : currentDesign.getTemplate().getDesigns()) {
-			if(found) {
-				currentDesign = design;
-				notifyViewTransformChange();
-				notifyMenuChange();
-				return;
-			}
-			if(design == currentDesign) {
-				found = true;
-			}
-		}
-	}
-
-	
-	public void incrementCurrentDesignCategory() {
-		boolean found = false;
-		for(DesignTemplate template : library().getTemplates()) {
-			if(found) {
-				currentDesign = template.getDesigns().firstElement();
-				notifyViewTransformChange();
-				notifyMenuChange();
-				return;
-			}
-			if(template == currentDesign.getTemplate()) {
-				found = true;
-			}
-		}
-	}
-	
-	public void setMenuColumn(int column) {
-		if(column >= 0 && column < 3) {
-			menuColumn = column;
-			notifyMenuChange();
-		}
-	}
-	
-	public void onMenuChange(Runnable callback) {
-		onMenuChange.add(callback);
+		notifyLibraryChange();
+		notifyViewTransformChange();		
 	}
 	
 	public void onViewTransformChange(Runnable callback) {
 		onViewTransformChange.add(callback);
 	}
-	public void notifyMenuChange() {
-		for(Runnable callback : onMenuChange) {
-			callback.run();
-		}
-		
-	}
+
 	public void notifyViewTransformChange() {
 		for(Runnable callback : onViewTransformChange) {
 			callback.run();
@@ -219,28 +139,7 @@ public class ArtistState {
 		currentDesign = d;
 		notifyViewTransformChange();
 	}
-	
-	public boolean isRuleMenuHidden() {
-		return rulemenuHidden;
-	}
-	
-	public void toggleRuleMenu() {
-		rulemenuHidden = !rulemenuHidden;
-		notifyMenuChange();
-	}
-	
-	public void setCurrentTemplate(int template) {
-		if(template < getTemplateCount() &&
-			template >= 0) {
-			templateNum = template;
-			notifyMenuChange();
-		}
-	}
-	
-	public int getCurrentTemplateNum() {
-		return templateNum;
-	}
-	
+				
 	public AffineTransform getViewTransform() {
 		return viewTransform;
 	}
@@ -291,17 +190,8 @@ public class ArtistState {
 		}
 	}
 	
-	
-	public void incrementTemplate() {
-		setCurrentTemplate(templateNum + 1);
-	}
-	
-	public void decrementTemplate() {
-		setCurrentTemplate(templateNum - 1);
-	}
-	
 	public DesignTemplate getCurrentTemplate() {
-		return library().getTemplates().get(getCurrentTemplateNum());
+		return currentTemplate;
 	}
 	
 	public int getTemplateCount() {
@@ -380,6 +270,20 @@ public class ArtistState {
 		return currentDesign;
 	}
 	
+	public void addLibraryListener(ActionListener l) {
+		libraryListeners.add(l);
+	}
+	public void removeLibraryListener(ActionListener l) {
+		libraryListeners.remove(l);
+	}
+	
+	public void notifyLibraryChange() {
+		ActionEvent e = new ActionEvent(this, 0,"Library changed");
+		for(ActionListener l: libraryListeners) {
+			l.actionPerformed(e);
+		}
+	}
+	
 	public void writeToFile(File file) {
 		
 		StateToSave toSave = new StateToSave();
@@ -387,6 +291,7 @@ public class ArtistState {
 		toSave.zoomLevel = zoomLevel;
 		toSave.viewTransform = viewTransform;
 		toSave.currentDesign = currentDesign;
+		toSave.currentTemplate = currentTemplate;
 		toSave.seed = seed;
 		
 		FileOutputStream fos = null;
@@ -411,13 +316,14 @@ public class ArtistState {
 			out = new ObjectInputStream(fos);
 			save = (StateToSave) out.readObject();
 			out.close();
-			library = save.library;
+
 			zoomLevel = save.zoomLevel;
 			viewTransform = save.viewTransform;
 			currentDesign = save.currentDesign;
+			currentTemplate = save.currentTemplate;
 			seed = save.seed;
-			templateNum = 0;
-			notifyMenuChange();
+			library = save.library;
+			notifyLibraryChange();
 			notifyViewTransformChange();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -438,8 +344,7 @@ public class ArtistState {
 	}
 
 	public void setCurrentTemplate(DesignTemplate template) {
-		// TODO Auto-generated method stub
-		
+		currentTemplate = template;
 	}
 	
 }
