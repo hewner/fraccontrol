@@ -11,6 +11,13 @@ public class OverallMenu extends JMenuBar implements ActionListener {
 	 
 	public OverallMenu(ArtistState newArtist)  {
 		JMenu fileMenu = new JMenu("File");
+		JMenuItem settings = new JMenuItem("Fractal settings...");
+		settings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				doSettings();
+			}
+		});
+		
 		JMenuItem load = new JMenuItem("Load fractal");
 		this.artist = newArtist;
 		fileMenu.add(load);
@@ -195,5 +202,9 @@ public class OverallMenu extends JMenuBar implements ActionListener {
 	    if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 	    	artist.readFromFile(fc.getSelectedFile());
 	    }		
-	}	
+	}
+	
+	private void doSettings() {
+		
+	}
 }

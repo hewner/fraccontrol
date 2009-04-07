@@ -14,13 +14,13 @@ class PaintThread implements Runnable {
 				this.mod = mod;
 				this.task = task;
 			}
-			@Override
 			public int compareTo(ModAndTask arg0) {
 				double myArea = task.getAbsoluteArea();
 				double otherArea = arg0.task.getAbsoluteArea();
 				//we want larger things first
-				return Double.compare(otherArea, myArea);
+				return Double.compare(otherArea, myArea);			
 			}
+
 		}
 		private PriorityQueue<ModAndTask> toDraw;
 		private Thread thread;

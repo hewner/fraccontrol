@@ -12,11 +12,9 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 
-import de.hardcode.jxinput.event.JXInputAxisEvent;
-import de.hardcode.jxinput.event.JXInputButtonEvent;
 //import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
+//import org.apache.batik.dom.GenericDOMImplementation;
+//import org.apache.batik.svggen.SVGGraphics2D;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DOMImplementation;
@@ -69,7 +67,7 @@ public class ArtistState {
 	}
 
 	public void outputToSVG(File filename) {
-		
+/*		
 		        // Get a DOMImplementation.
 		 DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
 
@@ -110,7 +108,7 @@ public class ArtistState {
 			System.out.println("Wrote file");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	public void makeNewDesign(DesignTemplate template) {
