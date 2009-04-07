@@ -11,16 +11,15 @@ import java.util.Vector;
 class DrawTask {
 	private Design design;
 	private double absoluteScale;
-	private Color bigColor;
-	private Color smallColor;
-	protected Color backgroundColor;
-	private static Color lBlue = new Color((float) .1,(float).1,(float).5);
-	private static Color dBlue = new Color((float) .0,(float).0,(float).2);
+	//private Color bigColor;
+	//private Color smallColor;
+	protected ColorScheme.ColorMode backgroundColor;
+	
 	private int uniqueName;
 	private Vector<DrawTask> subtasks;
 	protected DesignBounds sub;
-	protected Color parentBackground;
 	private AffineTransform transform;
+	
 	
 	public DrawTask(Design design, int seed) {
 		this.design = design;
@@ -45,51 +44,26 @@ class DrawTask {
 	}
 
 	public boolean setColorScheme(DrawTask parent) {
-		Color oldBigColor = bigColor;
+		ColorScheme.ColorMode oldScheme = backgroundColor;
 		if(parent == null) {
-			this.bigColor = Color.white;
-			this.smallColor = lBlue;
-			this.backgroundColor = bigColor;
-			this.parentBackground = Color.black;
+			this.backgroundColor = ColorScheme.first();
 		} else {
-			this.parentBackground = parent.backgroundColor;
 			if (parent.design.isBig(sub)) {
-				this.bigColor = parent.bigColor;
-				this.smallColor = parent.smallColor;
+				this.backgroundColor = ColorScheme.getContrast(parent.backgroundColor);
 			} else {
-				this.bigColor = parent.smallColor;
-				this.smallColor = parent.bigColor;
+				this.backgroundColor = ColorScheme.getOppositeContrast(parent.backgroundColor);
 			}
-			if(parent.backgroundColor != parent.bigColor) {
-				//double logColor = 1 + Math.log(absoluteScale)/10;
-				//this.color = new Color((float) (1 - logColor), (float) 1, (float) logColor, (float) 1);
-				this.backgroundColor = this.bigColor;
-			} else {
-				if(bigColor == lBlue) {
-					this.backgroundColor = dBlue;
-				} else {
-				this.backgroundColor = Color.black;
-				}
-			
-			}
-		}
-		return oldBigColor != bigColor;		
+		}		
+		return oldScheme != backgroundColor;
 	}
 	
-	public void drawErase(Graphics2D g) {
+	public void drawBackground(Graphics2D g, ColorScheme scheme) {
 		Graphics2D myG = (Graphics2D) g.create();
 		myG.transform(transform);
-		myG.setColor(parentBackground);
+		myG.setColor(scheme.color(backgroundColor));
 		design.getTemplate().drawFillShape(myG);
-	}
-	
-	public void drawBackground(Graphics2D g) {
-		Graphics2D myG = (Graphics2D) g.create();
-		myG.transform(transform);
-		myG.setColor(backgroundColor);
-		design.getTemplate().drawFillShape(myG);
-		if(bigColor == backgroundColor) {
-			myG.setColor(smallColor);
+		if(!ColorScheme.isContrast(backgroundColor)) {
+			myG.setColor(scheme.color(ColorScheme.getOpposite(backgroundColor)));
 			myG.setStroke(new BasicStroke((float) .005));
 			design.getTemplate().drawLineShape(myG);
 		}

@@ -298,6 +298,12 @@ public class ArtistState {
 		}
 		
 	}
+	
+	public ColorScheme colorScheme() {
+		final Color lBlue = new Color((float) .1,(float).1,(float).5);
+		final Color dBlue = new Color((float) .0,(float).0,(float).2);
+		return new ColorScheme(Color.white, Color.black, lBlue, dBlue);
+	}
 
 	public void setSize(int width, int height) {
 		this.componentWidth = width;

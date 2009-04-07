@@ -28,7 +28,7 @@ public class RemoveModification implements FractalModification
 	}
 
 	public void doDraw(DrawTask current) {
-		current.drawErase(g);
+		
 	}
 
 }
