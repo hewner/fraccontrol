@@ -69,7 +69,7 @@ public class OverallFrame extends JFrame {
 	
 	private static void createAndShowGUI() {
 		OverallFrame app = new OverallFrame();
- 
+		app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         app.setVisible(true);  
 		
 	}

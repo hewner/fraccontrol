@@ -138,7 +138,7 @@ public class FractalPainter implements FractalModification {
 	
 	public void doDraw(DrawTask current) {
 		if(!shouldDraw(g, current)) return;
-		current.drawBackground(g);
+		current.drawBackground(g, artist.colorScheme());
 		addToTaskCache(current);
 		List<DrawTask> subtasks = current.getSubtasks(); 
 		//System.out.println(subtasks.size() + " subtasks found.");

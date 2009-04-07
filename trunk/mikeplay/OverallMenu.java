@@ -8,10 +8,13 @@ public class OverallMenu extends JMenuBar implements ActionListener {
 	ArtistState artist;
 	JMenu designMenu;
 	JMenu brushMenu;
+	SettingsDialog settingsDialog;
 	 
 	public OverallMenu(ArtistState newArtist)  {
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem settings = new JMenuItem("Fractal settings...");
+		fileMenu.add(settings);
+		settingsDialog = new SettingsDialog(newArtist);
 		settings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				doSettings();
@@ -205,6 +208,6 @@ public class OverallMenu extends JMenuBar implements ActionListener {
 	}
 	
 	private void doSettings() {
-		
+		settingsDialog.setVisible(true);
 	}
 }
