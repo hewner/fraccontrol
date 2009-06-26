@@ -36,6 +36,7 @@ public class ArtistState {
 	protected Point2D previewRadius;
 	protected int seed;
 	protected FractalPainter painter;
+	protected ColorScheme colorScheme;
 
 	
 	public void newSeed() {
@@ -51,6 +52,9 @@ public class ArtistState {
 		resetZoomState();
 		library = new DesignTemplateLibrary();
 		newSeed();
+		final Color lBlue = new Color((float) .1,(float).1,(float).5);
+		final Color dBlue = new Color((float) .0,(float).0,(float).2);
+		colorScheme = new ColorScheme(Color.white, Color.black, lBlue, dBlue);
 	}
 
 	public void resetZoomState() {
@@ -300,9 +304,7 @@ public class ArtistState {
 	}
 	
 	public ColorScheme colorScheme() {
-		final Color lBlue = new Color((float) .1,(float).1,(float).5);
-		final Color dBlue = new Color((float) .0,(float).0,(float).2);
-		return new ColorScheme(Color.white, Color.black, lBlue, dBlue);
+		return colorScheme;
 	}
 
 	public void setSize(int width, int height) {
